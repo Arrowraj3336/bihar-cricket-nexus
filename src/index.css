@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 30% 8%;
+    --foreground: 0 0% 98%;
+
+    --card: 260 28% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 260 28% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 265 60% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 25% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 260 20% 15%;
+    --muted-foreground: 260 10% 60%;
+
+    --accent: 35 100% 55%;
+    --accent-foreground: 260 30% 8%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 260 20% 20%;
+    --input: 260 20% 20%;
+    --ring: 265 60% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom cricket tokens */
+    --cricket-gold: 45 100% 50%;
+    --cricket-orange: 25 100% 55%;
+    --cricket-purple: 280 70% 45%;
+    --cricket-green: 140 60% 40%;
+    --cricket-red: 0 75% 50%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(260 30% 8%) 0%, hsl(265 40% 15%) 50%, hsl(260 30% 8%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(260 28% 14%) 0%, hsl(260 28% 10%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(265 60% 50%) 0%, hsl(280 70% 45%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(45 100% 50%) 0%, hsl(35 100% 55%) 100%);
+
+    --shadow-glow: 0 0 40px hsl(265 60% 50% / 0.3);
+    --shadow-card: 0 8px 32px hsl(260 30% 4% / 0.5);
+
+    --sidebar-background: 260 28% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 265 60% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 25% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 260 20% 20%;
+    --sidebar-ring: 265 60% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer utilities {
+  .text-gradient-primary {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-accent);
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-gold);
+  }
+
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+  }
+
+  .bg-gradient-card {
+    background-image: var(--gradient-card);
+  }
+
+  .bg-gradient-accent {
+    background-image: var(--gradient-accent);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .cricket-ball-pattern {
+    background-image: radial-gradient(circle at 20% 80%, hsl(265 60% 50% / 0.05) 0%, transparent 50%),
+                       radial-gradient(circle at 80% 20%, hsl(280 70% 45% / 0.05) 0%, transparent 50%);
+  }
+
+  .scrollbar-modern {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(265 60% 50% / 0.3) transparent;
+  }
+  .scrollbar-modern::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .scrollbar-modern::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-modern::-webkit-scrollbar-thumb {
+    background: hsl(265 60% 50% / 0.3);
+    border-radius: 10px;
+  }
+  .scrollbar-modern::-webkit-scrollbar-thumb:hover {
+    background: hsl(265 60% 50% / 0.5);
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-reverse {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+}
