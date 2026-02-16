@@ -47,7 +47,7 @@ const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velo
 
 const TeamBadge = ({ team, size = "card" }: { team: typeof teams[0]; size?: "card" | "table" }) => {
   if (team.logo) {
-    const sizeClass = size === "card" ? "w-14 h-14 md:w-16 md:h-16" : "w-7 h-7";
+    const sizeClass = size === "card" ? "w-20 h-20 md:w-24 md:h-24" : "w-8 h-8";
     return <img src={team.logo} alt={team.name} className={`${sizeClass} object-contain rounded-lg`} />;
   }
   if (size === "table") {
