@@ -5,17 +5,13 @@ import brlLogo from "@/assets/logos/brl-logo-new.png";
 const HeroSection = () => {
   return (
     <section id="hero" className="relative min-h-screen flex items-end justify-center overflow-hidden">
-      {/* Full-screen background image */}
       <img
         src={heroBatsman}
         alt="Cricket batsman striking the ball"
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
-      
-      {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
-      {/* Hero text overlay */}
       <div className="container relative z-10 pb-16 md:pb-24 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -23,18 +19,18 @@ const HeroSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <img src={brlLogo} alt="BRL Logo" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain mx-auto mb-4 drop-shadow-[0_0_30px_hsl(265_60%_50%/0.4)]" />
-          <p className="text-cricket-gold font-display text-xs sm:text-sm md:text-base font-semibold tracking-[0.3em] uppercase mb-3 drop-shadow-lg">
+          <img src={brlLogo} alt="BRL Logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain mx-auto mb-4 drop-shadow-2xl" />
+          <p className="text-white/80 font-display text-xs sm:text-sm md:text-base font-semibold tracking-[0.3em] uppercase mb-3 drop-shadow-lg">
             Season 2026 • Bihar's Biggest Cricket Tournament
           </p>
           <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.05] mb-4 drop-shadow-2xl">
             <span className="text-white">WHERE RURAL</span>
             <br />
-            <span className="text-cricket-gold">TALENT</span>{" "}
+            <span className="text-white">TALENT</span>{" "}
             <span className="text-white">MEETS</span>
             <br />
             <span className="text-white">THE </span>
-            <span className="text-cricket-purple">BIG STAGE</span>
+            <span className="text-white">BIG STAGE</span>
           </h1>
           <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-lg mx-auto mb-8 drop-shadow-lg">
             Unleashing the power of grassroots cricket across Bihar.
@@ -57,7 +53,6 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      {/* Bottom gradient fade into next section */}
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
