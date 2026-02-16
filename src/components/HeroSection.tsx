@@ -36,13 +36,7 @@ const HeroSection = () => {
             Unleashing the power of grassroots cricket across Bihar.
             16 teams, 1 champion — the battle begins now.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="#matches"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gradient-accent text-primary-foreground font-heading font-semibold text-sm tracking-wider uppercase shadow-glow hover:opacity-90 transition-opacity"
-            >
-              View Schedule
-            </a>
+          <div className="flex justify-center">
             <a
               href="#teams"
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-white/30 text-white font-heading font-semibold text-sm tracking-wider uppercase hover:bg-white/10 transition-colors backdrop-blur-sm"
