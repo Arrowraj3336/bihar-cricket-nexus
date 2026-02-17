@@ -109,8 +109,10 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* Mobile: empty right spacer for centering */}
-        <div className="w-10 md:hidden" />
+        {/* Mobile: stump icon right */}
+        <div className="md:hidden w-10 h-10 rounded-xl bg-foreground/10 border border-foreground/20 flex items-center justify-center text-foreground">
+          <CricketStumps className="w-6 h-6 text-foreground" />
+        </div>
       </div>
     </motion.nav>
 

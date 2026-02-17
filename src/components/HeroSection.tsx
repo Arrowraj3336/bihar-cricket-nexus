@@ -28,7 +28,7 @@ const HeroSection = () => {
             <span className="text-foreground">WHERE RURAL</span>
             <br />
             <span className="text-foreground">TALENT</span>{" "}
-            <span className="text-gradient-primary">MEETS</span>
+            <span className="text-[hsl(340,80%,35%)] font-black">MEETS</span>
             <br />
             <span className="text-foreground">THE </span>
             <span className="text-foreground">BIG STAGE</span>
