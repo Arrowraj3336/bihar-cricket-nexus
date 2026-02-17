@@ -4,7 +4,7 @@ import brlLogo from "@/assets/logos/brl-logo-new.png";
 
 const HeroSection = () => {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-white to-background">
+    <section id="hero" className="relative min-h-screen flex items-start md:items-center justify-center overflow-hidden bg-gradient-to-b from-white via-white to-background">
       <img
         src={heroBatsman}
         alt="Cricket batsman striking the ball"
@@ -13,7 +13,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-background/90" />
       <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/30" />
 
-      <div className="container relative z-10 pt-24 pb-16 md:pb-24">
+      <div className="container relative z-10 pt-20 pb-16 md:pt-24 md:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
