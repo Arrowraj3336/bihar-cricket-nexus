@@ -14,6 +14,9 @@ import harshwardhanImg from "@/assets/member-harshwardhan.jpeg";
 import amitImg from "@/assets/member-amit.jpeg";
 import jiaulImg from "@/assets/member-jiaul.jpeg";
 import rupakImg from "@/assets/member-rupak.jpeg";
+import sanketImg from "@/assets/member-sanket.jpeg";
+import abhishekImg from "@/assets/member-abhishek.jpeg";
+import rahulImg from "@/assets/member-rahul.jpeg";
 
 const allMembers = [
   { name: "Mr. Anand Thakur", role: "Tournament Organiser Head", img: organiserImg, desc: "Leads the Bihar Rural League with a vision to uplift grassroots cricket across rural Bihar." },
@@ -25,6 +28,9 @@ const allMembers = [
   { name: "Mr. Amit Kumar", role: "Member Bihar Rural League", img: amitImg, desc: "An active member contributing to event planning, logistics, and ground-level tournament operations." },
   { name: "Mr. Jiaul Arfeen", role: "Secretary, Bihar Cricket Association", img: jiaulImg, desc: "Handles administrative duties and inter-organizational liaisons for Bihar's cricket ecosystem." },
   { name: "Mr. Rupak Kumar", role: "Media Manager", img: rupakImg, desc: "Directs media coverage, photography, and public relations for the Bihar Rural League." },
+  { name: "Mr. Sanket", role: "Support Personnel", img: sanketImg, desc: "Provides essential support across logistics, coordination, and on-ground tournament operations." },
+  { name: "Mr. Abhishek", role: "Elite Performance Staff", img: abhishekImg, desc: "Works closely with players to enhance elite-level performance standards and training quality." },
+  { name: "Mr. Rahul", role: "Athletic Performance Staff", img: rahulImg, desc: "Focuses on athletic conditioning, fitness programs, and physical readiness of all players." },
 ];
 
 const Members = () => {
