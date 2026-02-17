@@ -80,7 +80,7 @@ const Navbar = () => {
           <img
             src={brlLogo}
             alt="Bihar Rural League"
-            className="w-12 h-12 md:w-14 md:h-14 object-contain transition-transform duration-300 group-hover:scale-105"
+            className="w-14 h-14 sm:w-16 sm:h-16 md:w-14 md:h-14 object-contain transition-transform duration-300 group-hover:scale-105"
           />
           {/* Desktop only text */}
           <div className="hidden md:flex flex-col">

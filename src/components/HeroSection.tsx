@@ -4,15 +4,16 @@ import brlLogo from "@/assets/logos/brl-logo-new.png";
 
 const HeroSection = () => {
   return (
-    <section id="hero" className="relative min-h-screen flex items-end justify-center overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-white via-white to-background">
       <img
         src={heroBatsman}
         alt="Cricket batsman striking the ball"
-        className="absolute inset-0 w-full h-full object-cover object-top"
+        className="absolute inset-0 w-full h-full object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-background/90" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/30" />
 
-      <div className="container relative z-10 pb-16 md:pb-24 pt-32">
+      <div className="container relative z-10 pt-24 pb-16 md:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -20,26 +21,26 @@ const HeroSection = () => {
           className="text-center"
         >
           <img src={brlLogo} alt="BRL Logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain mx-auto mb-4 drop-shadow-2xl" />
-          <p className="text-white/70 font-display text-xs sm:text-sm md:text-base font-semibold tracking-[0.3em] uppercase mb-3 drop-shadow-lg">
+          <p className="text-foreground/60 font-display text-xs sm:text-sm md:text-base font-semibold tracking-[0.3em] uppercase mb-3">
             Season 2026 • Bihar's Biggest Cricket Tournament
           </p>
-          <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.05] mb-4 drop-shadow-2xl">
-            <span className="text-white">WHERE RURAL</span>
+          <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.05] mb-4">
+            <span className="text-foreground">WHERE RURAL</span>
             <br />
-            <span className="text-white">TALENT</span>{" "}
-            <span className="text-primary-foreground" style={{ WebkitTextStroke: '1px hsl(340 70% 35%)' }}>MEETS</span>
+            <span className="text-foreground">TALENT</span>{" "}
+            <span className="text-gradient-primary">MEETS</span>
             <br />
-            <span className="text-white">THE </span>
-            <span className="text-white">BIG STAGE</span>
+            <span className="text-foreground">THE </span>
+            <span className="text-foreground">BIG STAGE</span>
           </h1>
-          <p className="text-white/70 text-sm sm:text-base md:text-lg max-w-lg mx-auto mb-8 drop-shadow-lg">
+          <p className="text-foreground/60 text-sm sm:text-base md:text-lg max-w-lg mx-auto mb-8">
             Unleashing the power of grassroots cricket across Bihar.
             16 teams, 1 champion — the battle begins now.
           </p>
           <div className="flex justify-center">
             <a
               href="#teams"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-white/30 text-white font-heading font-semibold text-sm tracking-wider uppercase hover:bg-white/10 transition-colors backdrop-blur-sm"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-primary/30 text-primary font-heading font-semibold text-sm tracking-wider uppercase hover:bg-primary/5 transition-colors backdrop-blur-sm"
             >
               Explore Teams
             </a>
