@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Calendar, Trophy, Menu, X } from "lucide-react";
+import { Calendar, Trophy, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import brlLogo from "@/assets/logos/brl-logo-new.png";
+import { CricketStumps } from "@/components/CricketDecorations";
 
 const navLinks = [
   { label: "Home", href: "#hero" },
@@ -22,7 +23,6 @@ const Navbar = () => {
     const onScroll = () => {
       const currentY = window.scrollY;
       setScrolled(currentY > 30);
-
       if (currentY < 100) {
         setVisible(true);
       } else if (currentY < lastScrollY) {
@@ -56,14 +56,34 @@ const Navbar = () => {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       <div className="container flex items-center justify-between h-16 md:h-[72px]">
-        {/* Logo - left on mobile */}
-        <a href="#hero" className="flex items-center gap-2.5 group">
+        {/* Mobile: stump icon left */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="md:hidden w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-foreground hover:border-primary/40 transition-all duration-300"
+          aria-label="Toggle menu"
+        >
+          <AnimatePresence mode="wait">
+            {open ? (
+              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                <X size={20} />
+              </motion.div>
+            ) : (
+              <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                <CricketStumps className="w-5 h-5 text-primary" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </button>
+
+        {/* Center logo - big, no text */}
+        <a href="#hero" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center gap-2.5 group">
           <img
             src={brlLogo}
             alt="Bihar Rural League"
-            className="w-10 h-10 md:w-12 md:h-12 object-contain transition-transform duration-300 group-hover:scale-105"
+            className="w-12 h-12 md:w-14 md:h-14 object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="flex flex-col">
+          {/* Desktop only text */}
+          <div className="hidden md:flex flex-col">
             <span className="font-heading text-sm md:text-base font-black tracking-wider text-foreground leading-none">BRL</span>
             <span className="text-[8px] md:text-[9px] font-display text-muted-foreground tracking-widest uppercase leading-tight">Bihar Rural League</span>
           </div>
@@ -89,28 +109,12 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* Mobile menu toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-foreground hover:border-primary/40 transition-all duration-300"
-          aria-label="Toggle menu"
-        >
-          <AnimatePresence mode="wait">
-            {open ? (
-              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                <X size={20} />
-              </motion.div>
-            ) : (
-              <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                <Menu size={20} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </button>
+        {/* Mobile: empty right spacer for centering */}
+        <div className="w-10 md:hidden" />
       </div>
     </motion.nav>
 
-    {/* Mobile menu - modern slide-down style */}
+    {/* Mobile menu */}
     <AnimatePresence>
       {open && (
         <motion.div
@@ -122,7 +126,6 @@ const Navbar = () => {
           style={{ top: "4rem" }}
         >
           <div className="flex flex-col h-full">
-            {/* Nav links */}
             <div className="flex-1 flex flex-col px-6 pt-6 gap-1">
               {navLinks.map((link, i) => (
                 <motion.a
@@ -140,8 +143,6 @@ const Navbar = () => {
                 </motion.a>
               ))}
             </div>
-            
-            {/* Bottom CTA */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
