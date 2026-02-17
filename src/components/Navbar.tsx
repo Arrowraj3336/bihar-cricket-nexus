@@ -59,7 +59,7 @@ const Navbar = () => {
         {/* Mobile: stump icon left */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-foreground hover:border-primary/40 transition-all duration-300"
+          className="md:hidden w-10 h-10 rounded-xl bg-foreground/10 border border-foreground/20 flex items-center justify-center text-foreground hover:border-primary/40 transition-all duration-300"
           aria-label="Toggle menu"
         >
           <AnimatePresence mode="wait">
@@ -69,7 +69,7 @@ const Navbar = () => {
               </motion.div>
             ) : (
               <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                <CricketStumps className="w-5 h-5 text-primary" />
+                <CricketStumps className="w-6 h-6 text-foreground" />
               </motion.div>
             )}
           </AnimatePresence>

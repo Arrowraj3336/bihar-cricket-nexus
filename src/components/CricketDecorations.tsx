@@ -23,12 +23,14 @@ const CricketBat = ({ className = "" }: { className?: string }) => (
 
 const CricketStumps = ({ className = "" }: { className?: string }) => (
   <svg viewBox="0 0 80 120" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="20" y1="15" x2="20" y2="110" stroke="currentColor" strokeWidth="2" opacity="0.12" />
-    <line x1="40" y1="15" x2="40" y2="110" stroke="currentColor" strokeWidth="2" opacity="0.12" />
-    <line x1="60" y1="15" x2="60" y2="110" stroke="currentColor" strokeWidth="2" opacity="0.12" />
-    {/* Bails */}
-    <rect x="15" y="10" width="15" height="5" rx="2" stroke="currentColor" strokeWidth="1" opacity="0.15" />
-    <rect x="50" y="10" width="15" height="5" rx="2" stroke="currentColor" strokeWidth="1" opacity="0.15" />
+    <line x1="20" y1="15" x2="20" y2="110" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    <line x1="40" y1="15" x2="40" y2="110" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    <line x1="60" y1="15" x2="60" y2="110" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+    <rect x="14" y="8" width="17" height="7" rx="3" fill="currentColor" opacity="0.9" />
+    <rect x="49" y="8" width="17" height="7" rx="3" fill="currentColor" opacity="0.9" />
+    <circle cx="68" cy="95" r="10" fill="currentColor" opacity="0.85" />
+    <path d="M62 89 Q68 95 62 101" stroke="white" strokeWidth="1.2" opacity="0.6" />
+    <path d="M74 89 Q68 95 74 101" stroke="white" strokeWidth="1.2" opacity="0.6" />
   </svg>
 );
 
