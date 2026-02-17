@@ -15,50 +15,50 @@
     --popover: 0 0% 97%;
     --popover-foreground: 0 0% 8%;
 
-    --primary: 340 70% 35%;
+    --primary: 0 85% 30%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 93%;
+    --secondary: 0 10% 93%;
     --secondary-foreground: 0 0% 15%;
 
-    --muted: 0 0% 94%;
+    --muted: 0 5% 94%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 275 60% 40%;
+    --accent: 350 70% 25%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 340 70% 35%;
+    --border: 0 10% 88%;
+    --input: 0 10% 88%;
+    --ring: 0 85% 30%;
 
     --radius: 0.75rem;
 
     /* Custom cricket tokens */
     --cricket-gold: 45 100% 42%;
     --cricket-orange: 25 100% 50%;
-    --cricket-purple: 275 60% 40%;
+    --cricket-purple: 350 70% 25%;
     --cricket-green: 140 60% 35%;
-    --cricket-red: 340 70% 35%;
+    --cricket-red: 0 85% 30%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(340 30% 96%) 50%, hsl(275 20% 96%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 98%) 0%, hsl(0 0% 95%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(340 70% 35%) 0%, hsl(275 60% 40%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(340 70% 35%) 0%, hsl(275 60% 40%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(0 20% 96%) 50%, hsl(350 15% 96%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 98%) 0%, hsl(0 5% 95%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(0 85% 30%) 0%, hsl(350 70% 25%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(0 85% 30%) 0%, hsl(350 70% 25%) 100%);
 
-    --shadow-glow: 0 0 40px hsl(340 70% 35% / 0.15);
+    --shadow-glow: 0 0 40px hsl(0 85% 30% / 0.15);
     --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.06);
 
     --sidebar-background: 0 0% 97%;
     --sidebar-foreground: 0 0% 15%;
-    --sidebar-primary: 340 70% 35%;
+    --sidebar-primary: 0 85% 30%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 93%;
+    --sidebar-accent: 0 10% 93%;
     --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 340 70% 35%;
+    --sidebar-border: 0 10% 88%;
+    --sidebar-ring: 0 85% 30%;
   }
 }
 
@@ -108,13 +108,13 @@
   }
 
   .cricket-ball-pattern {
-    background-image: radial-gradient(circle at 20% 80%, hsl(340 70% 35% / 0.03) 0%, transparent 50%),
-                       radial-gradient(circle at 80% 20%, hsl(275 60% 40% / 0.03) 0%, transparent 50%);
+    background-image: radial-gradient(circle at 20% 80%, hsl(0 85% 30% / 0.03) 0%, transparent 50%),
+                       radial-gradient(circle at 80% 20%, hsl(350 70% 25% / 0.03) 0%, transparent 50%);
   }
 
   .scrollbar-modern {
     scrollbar-width: thin;
-    scrollbar-color: hsl(340 70% 35% / 0.2) transparent;
+    scrollbar-color: hsl(0 85% 30% / 0.2) transparent;
   }
   .scrollbar-modern::-webkit-scrollbar {
     height: 6px;
@@ -124,11 +124,11 @@
     background: transparent;
   }
   .scrollbar-modern::-webkit-scrollbar-thumb {
-    background: hsl(340 70% 35% / 0.2);
+    background: hsl(0 85% 30% / 0.2);
     border-radius: 10px;
   }
   .scrollbar-modern::-webkit-scrollbar-thumb:hover {
-    background: hsl(340 70% 35% / 0.4);
+    background: hsl(0 85% 30% / 0.4);
   }
 
   @keyframes marquee {
