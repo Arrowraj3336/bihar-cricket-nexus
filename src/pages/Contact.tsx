@@ -35,7 +35,7 @@ const Contact = () => {
       const mailtoBody = `Name: ${form.name}%0D%0ADate of Birth: ${form.dob}%0D%0APhone: ${form.phone}%0D%0AEmail: ${form.email}%0D%0ADocument Type: ${form.documentType}%0D%0ADocument Number: ${form.documentNumber}%0D%0APlayer Type: ${form.playerType}%0D%0AAddress: ${form.address}`;
       
       window.open(
-        `mailto:arrowxlabs@gmail.com?subject=BRL Player Registration - ${encodeURIComponent(form.name)}&body=${mailtoBody}`,
+        `mailto:dbrl.info@gmail.com?subject=BRL Player Registration - ${encodeURIComponent(form.name)}&body=${mailtoBody}`,
         "_blank"
       );
 
@@ -56,14 +56,21 @@ const Contact = () => {
     <div className="min-h-screen bg-background relative overflow-hidden">
       <Navbar />
 
-      {/* Background decorations */}
+      {/* Background decorations - cricket vectors */}
       <div className="absolute inset-0 cricket-ball-pattern opacity-50" />
-      <CricketBall className="absolute top-32 -left-10 w-24 h-24 text-primary opacity-[0.06]" />
-      <CricketBat className="absolute top-60 -right-8 w-12 h-36 text-accent opacity-[0.07] rotate-12" />
-      <CricketStumps className="absolute bottom-40 -left-6 w-14 h-24 text-primary opacity-[0.05]" />
-      <CricketBall className="absolute bottom-20 right-10 w-16 h-16 text-accent opacity-[0.05]" />
-      <CricketBat className="absolute top-[50%] -left-4 w-8 h-28 text-primary opacity-[0.04] -rotate-12" />
-      <CricketStumps className="absolute top-[30%] -right-4 w-10 h-20 text-accent opacity-[0.04]" />
+      <div className="absolute top-20 left-[5%] w-40 h-40 rounded-full bg-primary/5 blur-3xl" />
+      <div className="absolute bottom-32 right-[10%] w-48 h-48 rounded-full bg-accent/5 blur-3xl" />
+      <CricketBall className="absolute top-28 -left-8 w-28 h-28 text-primary opacity-[0.07]" />
+      <CricketBat className="absolute top-48 -right-6 w-14 h-40 text-accent opacity-[0.08] rotate-[15deg]" />
+      <CricketStumps className="absolute bottom-60 -left-4 w-16 h-28 text-primary opacity-[0.06]" />
+      <CricketBall className="absolute bottom-16 right-8 w-20 h-20 text-accent opacity-[0.06]" />
+      <CricketBat className="absolute top-[45%] -left-6 w-10 h-32 text-primary opacity-[0.05] -rotate-[20deg]" />
+      <CricketStumps className="absolute top-[25%] -right-6 w-14 h-24 text-accent opacity-[0.05]" />
+      <CricketBall className="absolute top-[65%] right-[15%] w-12 h-12 text-primary opacity-[0.04] hidden md:block" />
+      <CricketBat className="absolute bottom-[30%] left-[10%] w-8 h-24 text-accent opacity-[0.04] rotate-[35deg] hidden md:block" />
+      <CricketStumps className="absolute top-[80%] right-[5%] w-10 h-18 text-primary opacity-[0.04] hidden md:block" />
+      <CricketBall className="absolute top-[15%] right-[30%] w-10 h-10 text-accent opacity-[0.03] hidden lg:block" />
+      <CricketBat className="absolute bottom-[15%] right-[40%] w-6 h-20 text-primary opacity-[0.03] -rotate-12 hidden lg:block" />
 
       <div className="container relative z-10 pt-24 pb-16">
         {/* Header */}
@@ -89,8 +96,8 @@ const Contact = () => {
           className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-12"
         >
           {[
-            { icon: Phone, label: "Phone", value: "+91 XXXXX XXXXX" },
-            { icon: Mail, label: "Email", value: "arrowxlabs@gmail.com" },
+            { icon: Phone, label: "Phone", value: "+91 9801396077" },
+            { icon: Mail, label: "Email", value: "dbrl.info@gmail.com" },
             { icon: MapPin, label: "Location", value: "Darbhanga, Bihar" },
           ].map((item) => (
             <div key={item.label} className="rounded-xl border border-border bg-card/80 p-5 text-center relative overflow-hidden group hover:border-primary/30 transition-colors">
