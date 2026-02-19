@@ -6,6 +6,7 @@ import convenerImg from "@/assets/convener-gyaneshwar.jpeg";
 import chiefSelectorImg from "@/assets/chief-selector-anand.jpeg";
 import squadSelectorImg from "@/assets/squad-selector-rajesh.jpeg";
 import digitalExecImg from "@/assets/digital-exec-raaz.jpeg";
+import yashImg from "@/assets/member-yash.jpeg";
 import playerVector from "@/assets/player-vector.png";
 import heroBatsman from "@/assets/hero-batsman.jpeg";
 
@@ -45,6 +46,11 @@ const teamMembers = [
     name: "Mr. Raaz",
     role: "Chief Web Executive",
     img: digitalExecImg,
+  },
+  {
+    name: "Mr. Yash Traders",
+    role: "Treasurer",
+    img: yashImg,
   },
 ];
 
@@ -106,7 +112,7 @@ const OrganiserSection = () => {
         </div>
 
         {/* Other 3 Members */}
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-4 max-w-2xl mx-auto mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 max-w-3xl mx-auto mb-8">
           {teamMembers.slice(2).map((member, i) => (
             <motion.div
               key={member.name}

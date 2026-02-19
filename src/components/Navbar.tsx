@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Calendar, Trophy, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate, useLocation } from "react-router-dom";
 import brlLogo from "@/assets/logos/brl-logo-new.png";
 import { CricketStumps } from "@/components/CricketDecorations";
 
@@ -11,6 +12,7 @@ const navLinks = [
   { label: "Performers", href: "#performers" },
   { label: "Gallery", href: "#gallery" },
   { label: "About", href: "#organiser" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const Navbar = () => {
@@ -18,6 +20,21 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavClick = (href: string) => {
+    setOpen(false);
+    if (href.startsWith("/")) {
+      navigate(href);
+    } else if (href.startsWith("#")) {
+      if (location.pathname !== "/") {
+        navigate("/" + href);
+      } else {
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -92,14 +109,14 @@ const Navbar = () => {
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
-            <a
+            <button
               key={link.label}
-              href={link.href}
+              onClick={() => handleNavClick(link.href)}
               className="relative px-4 py-2 text-sm font-display font-semibold tracking-wide text-muted-foreground hover:text-foreground transition-all duration-300 group"
             >
               {link.label}
               <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-primary to-accent rounded-full group-hover:w-2/3 transition-all duration-300" />
-            </a>
+            </button>
           ))}
           <a
             href="#matches"
@@ -130,19 +147,18 @@ const Navbar = () => {
           <div className="flex flex-col h-full">
             <div className="flex-1 flex flex-col px-6 pt-6 gap-1">
               {navLinks.map((link, i) => (
-                <motion.a
+                <motion.button
                   key={link.label}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
+                  onClick={() => handleNavClick(link.href)}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
-                  className="flex items-center gap-4 py-4 px-4 rounded-2xl text-lg font-heading font-bold tracking-wide text-foreground/70 hover:text-foreground hover:bg-primary/5 transition-all duration-200"
+                  className="flex items-center gap-4 py-4 px-4 rounded-2xl text-lg font-heading font-bold tracking-wide text-foreground/70 hover:text-foreground hover:bg-primary/5 transition-all duration-200 text-left"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
                   {link.label}
-                </motion.a>
+                </motion.button>
               ))}
             </div>
             <motion.div
