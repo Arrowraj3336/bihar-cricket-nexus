@@ -109,6 +109,7 @@ const OrganiserSection = () => {
                   <img
                     src={member.img}
                     alt={member.name}
+                    loading="lazy"
                     className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl object-cover border border-border mb-3"
                   />
                   <span className="text-[9px] sm:text-xs text-accent font-display font-semibold uppercase tracking-wider mb-0.5">
@@ -138,6 +139,7 @@ const OrganiserSection = () => {
               <img
                 src={member.img}
                 alt={member.name}
+                loading="lazy"
                 className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-xl object-cover border border-border group-hover:border-primary/30 transition-colors mx-auto mb-2.5"
               />
               <span className="text-[9px] sm:text-[10px] md:text-xs text-accent font-display font-semibold uppercase tracking-wider block mb-0.5">
