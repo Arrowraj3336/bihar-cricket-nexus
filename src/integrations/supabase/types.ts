@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      gallery_images: {
+        Row: {
+          alt_text: string
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          show_on_homepage: boolean
+        }
+        Insert: {
+          alt_text?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          show_on_homepage?: boolean
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          show_on_homepage?: boolean
+        }
+        Relationships: []
+      }
+      points_table: {
+        Row: {
+          id: string
+          lost: number
+          played: number
+          points: number
+          team_name: string
+          updated_at: string
+          won: number
+        }
+        Insert: {
+          id?: string
+          lost?: number
+          played?: number
+          points?: number
+          team_name: string
+          updated_at?: string
+          won?: number
+        }
+        Update: {
+          id?: string
+          lost?: number
+          played?: number
+          points?: number
+          team_name?: string
+          updated_at?: string
+          won?: number
+        }
+        Relationships: []
+      }
       registrations: {
         Row: {
           address: string
@@ -50,6 +107,75 @@ export type Database = {
           name?: string
           phone?: string
           player_type?: string
+        }
+        Relationships: []
+      }
+      top_performers: {
+        Row: {
+          category: string
+          id: string
+          name: string
+          photo_url: string | null
+          runs: number
+          stat_label: string
+          stat_value: number
+          team: string
+          updated_at: string
+          wickets: number
+        }
+        Insert: {
+          category: string
+          id?: string
+          name: string
+          photo_url?: string | null
+          runs?: number
+          stat_label?: string
+          stat_value?: number
+          team: string
+          updated_at?: string
+          wickets?: number
+        }
+        Update: {
+          category?: string
+          id?: string
+          name?: string
+          photo_url?: string | null
+          runs?: number
+          stat_label?: string
+          stat_value?: number
+          team?: string
+          updated_at?: string
+          wickets?: number
+        }
+        Relationships: []
+      }
+      upcoming_matches: {
+        Row: {
+          created_at: string
+          id: string
+          location: string
+          match_date: string
+          match_time: string
+          team1: string
+          team2: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string
+          match_date: string
+          match_time: string
+          team1: string
+          team2: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string
+          match_date?: string
+          match_time?: string
+          team1?: string
+          team2?: string
         }
         Relationships: []
       }
