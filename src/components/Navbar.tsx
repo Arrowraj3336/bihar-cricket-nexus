@@ -13,6 +13,7 @@ const navLinks = [
   { label: "Gallery", href: "#gallery" },
   { label: "About", href: "#organiser" },
   { label: "Contact", href: "/contact" },
+  { label: "BCA", href: "https://biharcricketassociation.com/" },
 ];
 
 const Navbar = () => {
@@ -25,7 +26,9 @@ const Navbar = () => {
 
   const handleNavClick = (href: string) => {
     setOpen(false);
-    if (href.startsWith("/")) {
+    if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else if (href.startsWith("/")) {
       navigate(href);
     } else if (href.startsWith("#")) {
       if (location.pathname !== "/") {

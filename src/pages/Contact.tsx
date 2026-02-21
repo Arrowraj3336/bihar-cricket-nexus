@@ -5,6 +5,7 @@ import { CricketBall, CricketBat, CricketStumps } from "@/components/CricketDeco
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const playerTypes = ["Batter", "Bowler", "All Rounder", "Wicket Keeper"];
 const documentTypes = ["Aadhar Card", "Birth Certificate"];
@@ -32,21 +33,20 @@ const Contact = () => {
     setSubmitting(true);
 
     try {
-      const mailtoBody = `Name: ${form.name}%0D%0ADate of Birth: ${form.dob}%0D%0APhone: ${form.phone}%0D%0AEmail: ${form.email}%0D%0ADocument Type: ${form.documentType}%0D%0ADocument Number: ${form.documentNumber}%0D%0APlayer Type: ${form.playerType}%0D%0AAddress: ${form.address}`;
-      
-      window.open(
-        `mailto:dbrl.info@gmail.com?subject=BRL Player Registration - ${encodeURIComponent(form.name)}&body=${mailtoBody}`,
-        "_blank"
-      );
+      const { data, error } = await supabase.functions.invoke("submit-registration", {
+        body: form,
+      });
+
+      if (error) throw error;
 
       toast({
-        title: "Registration Submitted!",
-        description: "Your email client has been opened. Please send the email to complete registration.",
+        title: "Registration Submitted! ✅",
+        description: "Your registration has been saved successfully. Our team will contact you soon.",
       });
 
       setForm({ name: "", dob: "", phone: "", email: "", documentType: "", documentNumber: "", playerType: "", address: "" });
-    } catch {
-      toast({ title: "Error", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
