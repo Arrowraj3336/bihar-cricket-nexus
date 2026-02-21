@@ -1,6 +1,11 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Camera, Sparkles } from "lucide-react";
+import { Camera, Sparkles, ArrowRight } from "lucide-react";
 import { CricketBall, CricketBat } from "./CricketDecorations";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+
+// Static fallback images
 import gallery1 from "@/assets/gallery-1.jpg";
 import gallery2 from "@/assets/gallery-2.jpg";
 import gallery3 from "@/assets/gallery-3.jpg";
@@ -9,7 +14,7 @@ import gallery5 from "@/assets/gallery-5.jpg";
 import gallery6 from "@/assets/gallery-6.jpg";
 import gallery7 from "@/assets/gallery-7.jpg";
 
-const images = [
+const fallbackImages = [
   { src: gallery1, alt: "Team group photo" },
   { src: gallery2, alt: "Player gathering" },
   { src: gallery3, alt: "Guest speech" },
@@ -20,6 +25,24 @@ const images = [
 ];
 
 const GallerySection = () => {
+  const [images, setImages] = useState<{ src: string; alt: string }[]>(fallbackImages);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from("gallery_images")
+        .select("*")
+        .eq("show_on_homepage", true)
+        .order("created_at", { ascending: false })
+        .limit(7);
+      
+      if (data && data.length > 0) {
+        setImages(data.map(img => ({ src: img.image_url, alt: img.alt_text || "Gallery photo" })));
+      }
+    };
+    load();
+  }, []);
+
   return (
     <section id="gallery" className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
       <CricketBall className="absolute -bottom-8 -right-8 w-40 h-40 text-primary" />
@@ -52,21 +75,22 @@ const GallerySection = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className={`relative overflow-hidden rounded-xl group ${
-                i === 0 ? "col-span-2 row-span-2" : ""
-              }`}
+              className={`relative overflow-hidden rounded-xl group ${i === 0 ? "col-span-2 row-span-2" : ""}`}
             >
-              <img
-                src={img.src}
-                alt={img.alt}
-                loading="lazy"
-                className="w-full h-full object-cover aspect-video group-hover:scale-105 transition-transform duration-500"
-              />
+              <img src={img.src} alt={img.alt} loading="lazy"
+                className="w-full h-full object-cover aspect-video group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                 <span className="font-heading text-sm font-semibold text-background">{img.alt}</span>
               </div>
             </motion.div>
           ))}
+        </div>
+
+        <div className="text-center mt-8">
+          <Link to="/gallery"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-accent text-primary-foreground font-heading font-semibold text-sm tracking-wider uppercase shadow-glow hover:opacity-90 transition-opacity">
+            View Full Gallery <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </section>

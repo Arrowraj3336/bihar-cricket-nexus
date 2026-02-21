@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { CricketBall, CricketStumps } from "./CricketDecorations";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 import logoLions from "@/assets/logos/darbhanga-lions.png";
 import logoWarriors from "@/assets/logos/darbhanga-warriors.png";
@@ -20,59 +21,123 @@ import logoGladiators from "@/assets/logos/darbhanga-gladiators.png";
 import logoSuperGiants from "@/assets/logos/darbhanga-super-giants.png";
 import logoMavericks from "@/assets/logos/darbhanga-mavericks.png";
 
-const teams = [
-  { name: "Darbhanga Lions", abbr: "DL", color: "hsl(265 60% 50%)", logo: logoLions, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Warriors", abbr: "DW", color: "hsl(25 100% 55%)", logo: logoWarriors, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Royals", abbr: "DR", color: "hsl(140 60% 40%)", logo: logoRoyals, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Tigers", abbr: "DT", color: "hsl(0 75% 50%)", logo: logoTigers, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Panthers", abbr: "DP", color: "hsl(200 80% 50%)", logo: logoPanthers, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Strikers", abbr: "DS", color: "hsl(45 100% 50%)", logo: logoStrikers, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Kings", abbr: "DK", color: "hsl(280 70% 45%)", logo: logoKings, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Challengers", abbr: "DC", color: "hsl(340 70% 50%)", logo: logoChallengers, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Falcons", abbr: "DF", color: "hsl(180 60% 45%)", logo: logoFalcons, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Hurricanes", abbr: "DH", color: "hsl(15 80% 50%)", logo: logoHurricanes, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Blasters", abbr: "DB", color: "hsl(50 90% 45%)", logo: logoBlasters, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Super XI", abbr: "DX", color: "hsl(120 50% 45%)", logo: logoSuperXI, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Thunder", abbr: "DTH", color: "hsl(210 70% 55%)", logo: logoThunder, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Gladiators", abbr: "DG", color: "hsl(300 50% 45%)", logo: logoGladiators, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Super Giants", abbr: "DSG", color: "hsl(30 70% 50%)", logo: logoSuperGiants, played: 0, won: 0, lost: 0, pts: 0 },
-  { name: "Darbhanga Mavericks", abbr: "DM", color: "hsl(350 60% 50%)", logo: logoMavericks, played: 0, won: 0, lost: 0, pts: 0 },
+const logoMap: Record<string, string> = {
+  "Darbhanga Lions": logoLions,
+  "Darbhanga Warriors": logoWarriors,
+  "Darbhanga Royals": logoRoyals,
+  "Darbhanga Tigers": logoTigers,
+  "Darbhanga Panthers": logoPanthers,
+  "Darbhanga Strikers": logoStrikers,
+  "Darbhanga Kings": logoKings,
+  "Darbhanga Challengers": logoChallengers,
+  "Darbhanga Falcons": logoFalcons,
+  "Darbhanga Hurricanes": logoHurricanes,
+  "Darbhanga Blasters": logoBlasters,
+  "Darbhanga Super XI": logoSuperXI,
+  "Darbhanga Thunder": logoThunder,
+  "Darbhanga Gladiators": logoGladiators,
+  "Darbhanga Super Giants": logoSuperGiants,
+  "Darbhanga Mavericks": logoMavericks,
+};
+
+const colorMap: Record<string, string> = {
+  "Darbhanga Lions": "hsl(265 60% 50%)",
+  "Darbhanga Warriors": "hsl(25 100% 55%)",
+  "Darbhanga Royals": "hsl(140 60% 40%)",
+  "Darbhanga Tigers": "hsl(0 75% 50%)",
+  "Darbhanga Panthers": "hsl(200 80% 50%)",
+  "Darbhanga Strikers": "hsl(45 100% 50%)",
+  "Darbhanga Kings": "hsl(280 70% 45%)",
+  "Darbhanga Challengers": "hsl(340 70% 50%)",
+  "Darbhanga Falcons": "hsl(180 60% 45%)",
+  "Darbhanga Hurricanes": "hsl(15 80% 50%)",
+  "Darbhanga Blasters": "hsl(50 90% 45%)",
+  "Darbhanga Super XI": "hsl(120 50% 45%)",
+  "Darbhanga Thunder": "hsl(210 70% 55%)",
+  "Darbhanga Gladiators": "hsl(300 50% 45%)",
+  "Darbhanga Super Giants": "hsl(30 70% 50%)",
+  "Darbhanga Mavericks": "hsl(350 60% 50%)",
+};
+
+const abbrMap: Record<string, string> = {
+  "Darbhanga Lions": "DL", "Darbhanga Warriors": "DW", "Darbhanga Royals": "DR",
+  "Darbhanga Tigers": "DT", "Darbhanga Panthers": "DP", "Darbhanga Strikers": "DS",
+  "Darbhanga Kings": "DK", "Darbhanga Challengers": "DC", "Darbhanga Falcons": "DF",
+  "Darbhanga Hurricanes": "DH", "Darbhanga Blasters": "DB", "Darbhanga Super XI": "DX",
+  "Darbhanga Thunder": "DTH", "Darbhanga Gladiators": "DG", "Darbhanga Super Giants": "DSG",
+  "Darbhanga Mavericks": "DM",
+};
+
+const defaultTeams = [
+  "Darbhanga Lions", "Darbhanga Warriors", "Darbhanga Royals", "Darbhanga Tigers",
+  "Darbhanga Panthers", "Darbhanga Strikers", "Darbhanga Kings", "Darbhanga Challengers",
+  "Darbhanga Falcons", "Darbhanga Hurricanes", "Darbhanga Blasters", "Darbhanga Super XI",
+  "Darbhanga Thunder", "Darbhanga Gladiators", "Darbhanga Super Giants", "Darbhanga Mavericks",
 ];
 
+type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number };
+
 const TEAMS_PER_PAGE = 4;
-const totalPages = Math.ceil(teams.length / TEAMS_PER_PAGE);
 
 const swipeConfidenceThreshold = 8000;
 const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
 
-const TeamBadge = ({ team, size = "card" }: { team: typeof teams[0]; size?: "card" | "table" }) => {
+const TeamBadge = ({ team, size = "card" }: { team: TeamData; size?: "card" | "table" }) => {
   if (team.logo) {
     const sizeClass = size === "card" ? "w-20 h-20 md:w-24 md:h-24" : "w-8 h-8";
     return <img src={team.logo} alt={team.name} className={`${sizeClass} object-contain rounded-lg`} />;
   }
   if (size === "table") {
     return (
-      <div
-        className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-bold shrink-0"
-        style={{ backgroundColor: team.color + "25", color: team.color }}
-      >
-        {team.abbr}
-      </div>
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-bold shrink-0"
+        style={{ backgroundColor: team.color + "25", color: team.color }}>{team.abbr}</div>
     );
   }
   return (
-    <div
-      className="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center font-heading font-bold text-base md:text-lg border-2 transition-transform group-hover:scale-110"
-      style={{ borderColor: team.color, color: team.color, backgroundColor: team.color + "18" }}
-    >
-      {team.abbr}
-    </div>
+    <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center font-heading font-bold text-base md:text-lg border-2 transition-transform group-hover:scale-110"
+      style={{ borderColor: team.color, color: team.color, backgroundColor: team.color + "18" }}>{team.abbr}</div>
   );
 };
 
 const TeamsSection = () => {
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [teams, setTeams] = useState<TeamData[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase.from("points_table").select("*").order("points", { ascending: false });
+      
+      if (data && data.length > 0) {
+        // Merge DB data with defaults
+        const dbMap = new Map(data.map(d => [d.team_name, d]));
+        const merged = defaultTeams.map(name => {
+          const db = dbMap.get(name);
+          return {
+            name,
+            abbr: abbrMap[name] || "??",
+            color: colorMap[name] || "hsl(0 0% 50%)",
+            logo: logoMap[name] || "",
+            played: db?.played || 0,
+            won: db?.won || 0,
+            lost: db?.lost || 0,
+            pts: db?.points || 0,
+          };
+        });
+        // Sort by points descending
+        merged.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
+        setTeams(merged);
+      } else {
+        setTeams(defaultTeams.map(name => ({
+          name, abbr: abbrMap[name] || "??", color: colorMap[name] || "hsl(0 0% 50%)",
+          logo: logoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
+        })));
+      }
+    };
+    load();
+  }, []);
+
+  const totalPages = Math.ceil(teams.length / TEAMS_PER_PAGE);
 
   const paginate = (dir: number) => {
     setDirection(dir);
@@ -93,18 +158,15 @@ const TeamsSection = () => {
     exit: (dir: number) => ({ x: dir < 0 ? 300 : -300, opacity: 0 }),
   };
 
+  if (teams.length === 0) return null;
+
   return (
     <section id="teams" className="py-16 md:py-24 bg-background cricket-ball-pattern relative overflow-hidden">
       <CricketStumps className="absolute -right-4 top-20 w-16 h-24 text-primary hidden md:block" />
       <CricketBall className="absolute -left-6 bottom-32 w-16 h-16 text-accent opacity-30 hidden md:block" />
 
       <div className="container relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-8 md:mb-10"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8 md:mb-10">
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-3">
             <Trophy size={14} className="text-accent" />
             <span className="text-xs font-display font-semibold text-accent uppercase tracking-wider">Season Standings</span>
@@ -117,45 +179,24 @@ const TeamsSection = () => {
 
         {/* 2x2 Swipeable Team Grid */}
         <div className="mb-8 relative">
-          <button
-            onClick={() => paginate(-1)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors -ml-1 md:hidden"
-          >
+          <button onClick={() => paginate(-1)} className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors -ml-1 md:hidden">
             <ChevronLeft size={16} />
           </button>
-          <button
-            onClick={() => paginate(1)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors -mr-1 md:hidden"
-          >
+          <button onClick={() => paginate(1)} className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors -mr-1 md:hidden">
             <ChevronRight size={16} />
           </button>
 
           <div className="overflow-hidden px-6 md:px-0">
             <AnimatePresence initial={false} custom={direction} mode="wait">
-              <motion.div
-                key={page}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.8}
-                onDragEnd={handleDragEnd}
-                className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 cursor-grab active:cursor-grabbing"
-              >
+              <motion.div key={page} custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }} drag="x" dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.8} onDragEnd={handleDragEnd}
+                className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 cursor-grab active:cursor-grabbing">
                 {currentTeams.map((team) => (
-                  <div
-                    key={team.abbr}
-                    className="relative bg-gradient-card rounded-2xl p-4 md:p-5 border border-border hover:border-primary/40 transition-all duration-300 shadow-card group"
-                  >
+                  <div key={team.abbr} className="relative bg-gradient-card rounded-2xl p-4 md:p-5 border border-border hover:border-primary/40 transition-all duration-300 shadow-card group">
                     <div className="flex flex-col items-center gap-3">
                       <TeamBadge team={team} size="card" />
-                      <span className="font-heading text-xs md:text-sm font-semibold text-center leading-tight">
-                        {team.name}
-                      </span>
+                      <span className="font-heading text-xs md:text-sm font-semibold text-center leading-tight">{team.name}</span>
                     </div>
                   </div>
                 ))}
@@ -165,24 +206,16 @@ const TeamsSection = () => {
 
           <div className="flex justify-center gap-2 mt-4">
             {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setDirection(i > page ? 1 : -1); setPage(i); }}
-                className={`h-2 rounded-full transition-all ${i === page ? "bg-accent w-6" : "bg-border w-2"}`}
-                aria-label={`Page ${i + 1}`}
-              />
+              <button key={i} onClick={() => { setDirection(i > page ? 1 : -1); setPage(i); }}
+                className={`h-2 rounded-full transition-all ${i === page ? "bg-accent w-6" : "bg-border w-2"}`} aria-label={`Page ${i + 1}`} />
             ))}
           </div>
           <p className="text-center text-muted-foreground text-[10px] mt-2 md:hidden">← Swipe to see all teams →</p>
         </div>
 
         {/* Points Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-gradient-card rounded-2xl border border-border shadow-card overflow-hidden"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          className="bg-gradient-card rounded-2xl border border-border shadow-card overflow-hidden">
           <div className="px-4 py-3 border-b border-border flex items-center gap-2">
             <Trophy size={16} className="text-accent" />
             <h3 className="font-heading text-sm md:text-base font-bold uppercase tracking-wider">Points Table</h3>
@@ -202,14 +235,9 @@ const TeamsSection = () => {
               </thead>
               <tbody>
                 {teams.map((team, i) => (
-                  <tr
-                    key={team.abbr}
-                    className={`border-b border-border/40 hover:bg-primary/5 transition-colors ${i < 4 ? "bg-primary/[0.03]" : ""}`}
-                  >
+                  <tr key={team.abbr} className={`border-b border-border/40 hover:bg-primary/5 transition-colors ${i < 4 ? "bg-primary/[0.03]" : ""}`}>
                     <td className="px-3 py-3">
-                      <span className={`font-heading text-sm font-bold ${i < 4 ? "text-accent" : "text-muted-foreground"}`}>
-                        {i + 1}
-                      </span>
+                      <span className={`font-heading text-sm font-bold ${i < 4 ? "text-accent" : "text-muted-foreground"}`}>{i + 1}</span>
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
@@ -221,9 +249,7 @@ const TeamsSection = () => {
                     <td className="text-center px-2 py-3 text-xs font-semibold text-cricket-green">{team.won}</td>
                     <td className="text-center px-2 py-3 text-xs font-semibold text-cricket-red">{team.lost}</td>
                     <td className="text-center px-2 py-3">
-                      <span className="font-heading font-bold text-accent text-sm bg-accent/10 px-2 py-0.5 rounded-md">
-                        {team.pts}
-                      </span>
+                      <span className="font-heading font-bold text-accent text-sm bg-accent/10 px-2 py-0.5 rounded-md">{team.pts}</span>
                     </td>
                   </tr>
                 ))}
