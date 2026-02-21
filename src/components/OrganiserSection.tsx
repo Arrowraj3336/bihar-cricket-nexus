@@ -27,36 +27,43 @@ const teamMembers = [
     name: "Mr. Anand Thakur",
     role: "Tournament Organiser Head",
     img: organiserImg,
+    bio: "Pioneering rural cricket development across Bihar since 2010.",
   },
   {
     name: "Mr. Gyaneshwar Gautam",
     role: "Convener, Governing Council",
     img: convenerImg,
+    bio: "Ensuring transparent governance and fair play standards.",
   },
   {
     name: "Mr. Sarfaraz Hussain",
     role: "Chairman",
     img: sarfarazImg,
+    bio: "Leading the league's strategic vision and partnerships.",
   },
   {
     name: "Mr. Rajesh",
     role: "Squad Selector Head",
     img: squadSelectorImg,
+    bio: "Identifying and nurturing grassroots cricket talent.",
   },
   {
     name: "Mr. Anand",
     role: "Chief Selector",
     img: chiefSelectorImg,
+    bio: "Curating competitive squads for every franchise.",
   },
   {
     name: "Mr. Raaz",
     role: "Chief Web Executive",
     img: digitalExecImg,
+    bio: "Driving digital innovation and online engagement.",
   },
   {
     name: "Mr. Gautam Thakur",
     role: "Treasurer",
     img: yashImg,
+    bio: "Managing league finances with integrity and precision.",
   },
 ];
 
@@ -88,38 +95,36 @@ const OrganiserSection = () => {
           </p>
         </motion.div>
 
-        {/* Leaders - Top 2 */}
-        <div className="max-w-2xl mx-auto mb-6">
+        {/* Leaders - Top 3 */}
+        <div className="max-w-3xl mx-auto mb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="rounded-2xl border border-border bg-card/80 p-5 md:p-8"
           >
-            <div className="grid grid-cols-2 gap-4 md:gap-8 mb-5">
-              {teamMembers.slice(0, 2).map((member) => (
+            <div className="grid grid-cols-3 gap-3 md:gap-6">
+              {teamMembers.slice(0, 3).map((member) => (
                 <div key={member.name} className="flex flex-col items-center text-center">
                   <img
                     src={member.img}
                     alt={member.name}
-                    className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl object-cover border border-border mb-3"
+                    className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl object-cover border border-border mb-3"
                   />
-                  <span className="text-[10px] sm:text-xs text-accent font-display font-semibold uppercase tracking-wider mb-0.5">
+                  <span className="text-[9px] sm:text-xs text-accent font-display font-semibold uppercase tracking-wider mb-0.5">
                     {member.role}
                   </span>
-                  <h3 className="font-heading text-sm sm:text-base md:text-lg font-bold text-foreground">{member.name}</h3>
+                  <h3 className="font-heading text-xs sm:text-sm md:text-base font-bold text-foreground mb-1">{member.name}</h3>
+                  <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground leading-snug">{member.bio}</p>
                 </div>
               ))}
             </div>
-            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed text-center">
-              Visionary sports administrators dedicated to promoting rural cricket talent across Bihar with over 15 years of experience.
-            </p>
           </motion.div>
         </div>
 
-        {/* Other 3 Members */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-4 max-w-4xl mx-auto mb-8">
-          {teamMembers.slice(2).map((member, i) => (
+        {/* Other Members */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 max-w-4xl mx-auto mb-8">
+          {teamMembers.slice(3).map((member, i) => (
             <motion.div
               key={member.name}
               initial={{ opacity: 0, y: 20 }}
@@ -136,7 +141,8 @@ const OrganiserSection = () => {
               <span className="text-[9px] sm:text-[10px] md:text-xs text-accent font-display font-semibold uppercase tracking-wider block mb-0.5">
                 {member.role}
               </span>
-              <h4 className="font-heading text-xs sm:text-sm md:text-base font-bold text-foreground">{member.name}</h4>
+              <h4 className="font-heading text-xs sm:text-sm md:text-base font-bold text-foreground mb-1">{member.name}</h4>
+              <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground leading-snug">{member.bio}</p>
             </motion.div>
           ))}
         </div>
