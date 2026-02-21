@@ -34,6 +34,11 @@ const teamMembers = [
     img: convenerImg,
   },
   {
+    name: "Mr. Sarfaraz Hussain",
+    role: "Chairman",
+    img: sarfarazImg,
+  },
+  {
     name: "Mr. Rajesh",
     role: "Squad Selector Head",
     img: squadSelectorImg,
@@ -52,11 +57,6 @@ const teamMembers = [
     name: "Mr. Gautam Thakur",
     role: "Treasurer",
     img: yashImg,
-  },
-  {
-    name: "Mr. Sarfaraz Hussain",
-    role: "Chairman",
-    img: sarfarazImg,
   },
 ];
 

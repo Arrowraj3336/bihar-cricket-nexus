@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import heroBatsman from "@/assets/hero-batsman.jpeg";
 import brlLogo from "@/assets/logos/brl-logo-new.png";
-import bcaLogo from "@/assets/logos/bca-logo.png";
 
 const HeroSection = () => {
   return (
@@ -21,9 +20,8 @@ const HeroSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <img src={brlLogo} alt="BRL Logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-contain drop-shadow-2xl" />
-            <img src={bcaLogo} alt="Bihar Cricket Association" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain drop-shadow-2xl" />
+          <div className="flex items-center justify-center mb-4">
+            <img src={brlLogo} alt="BRL Logo" className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain drop-shadow-2xl" />
           </div>
           <p className="text-foreground/70 font-display text-xs sm:text-sm md:text-base font-semibold tracking-[0.3em] uppercase mb-3">
             Season 2026 • Bihar's Biggest Cricket Tournament

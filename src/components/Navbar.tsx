@@ -3,6 +3,7 @@ import { Calendar, Trophy, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import brlLogo from "@/assets/logos/brl-logo-new.png";
+import bcaLogo from "@/assets/logos/bca-logo.png";
 import { CricketStumps } from "@/components/CricketDecorations";
 
 const navLinks = [
@@ -96,16 +97,19 @@ const Navbar = () => {
         </button>
 
         {/* Center logo - big, no text */}
-        <a href="#hero" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center gap-2.5 group">
+        <a href="#hero" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center gap-3 group">
           <img
             src={brlLogo}
             alt="Bihar Rural League"
-            className="w-14 h-14 sm:w-16 sm:h-16 md:w-14 md:h-14 object-contain transition-transform duration-300 group-hover:scale-105"
+            className="w-14 h-14 sm:w-16 sm:h-16 md:w-12 md:h-12 object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          {/* Desktop only text */}
-          <div className="hidden md:flex flex-col">
-            <span className="font-heading text-sm md:text-base font-black tracking-wider text-foreground leading-none">BRL</span>
-            <span className="text-[8px] md:text-[9px] font-display text-muted-foreground tracking-widest uppercase leading-tight">Bihar Rural League</span>
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex flex-col">
+              <span className="font-heading text-sm font-black tracking-wider text-foreground leading-none">BRL</span>
+              <span className="text-[8px] font-display text-muted-foreground tracking-widest uppercase leading-tight">Bihar Rural League</span>
+            </div>
+            <div className="w-px h-8 bg-border mx-1" />
+            <img src={bcaLogo} alt="Bihar Cricket Association" className="w-9 h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
           </div>
         </a>
 
