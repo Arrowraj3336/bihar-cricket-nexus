@@ -1,0 +1,18 @@
+export const TEAM_NAMES = [
+  "Darbhanga Lions",
+  "Darbhanga Warriors",
+  "Darbhanga Royals",
+  "Darbhanga Tigers",
+  "Darbhanga Panthers",
+  "Darbhanga Strikers",
+  "Darbhanga Kings",
+  "Darbhanga Challengers",
+  "Darbhanga Falcons",
+  "Darbhanga Hurricanes",
+  "Darbhanga Blasters",
+  "Darbhanga Super XI",
+  "Darbhanga Thunder",
+  "Darbhanga Gladiators",
+  "Darbhanga Super Giants",
+  "Darbhanga Mavericks",
+] as const;
