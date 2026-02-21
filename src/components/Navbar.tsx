@@ -97,19 +97,17 @@ const Navbar = () => {
         </button>
 
         {/* Center logo - big, no text */}
-        <a href="#hero" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center gap-3 group">
+        <a href="#hero" className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center gap-2 group">
           <img
             src={brlLogo}
             alt="Bihar Rural League"
-            className="w-14 h-14 sm:w-16 sm:h-16 md:w-12 md:h-12 object-contain transition-transform duration-300 group-hover:scale-105"
+            className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 object-contain transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="hidden md:flex items-center gap-2">
-            <div className="flex flex-col">
-              <span className="font-heading text-sm font-black tracking-wider text-foreground leading-none">BRL</span>
-              <span className="text-[8px] font-display text-muted-foreground tracking-widest uppercase leading-tight">Bihar Rural League</span>
-            </div>
-            <div className="w-px h-8 bg-border mx-1" />
-            <img src={bcaLogo} alt="Bihar Cricket Association" className="w-9 h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="w-px h-7 bg-border/60" />
+          <img src={bcaLogo} alt="Bihar Cricket Association" className="w-8 h-8 sm:w-9 sm:h-9 object-contain opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="hidden md:flex flex-col ml-1">
+            <span className="font-heading text-sm font-black tracking-wider text-foreground leading-none">BRL</span>
+            <span className="text-[8px] font-display text-muted-foreground tracking-widest uppercase leading-tight">Bihar Rural League</span>
           </div>
         </a>
 
