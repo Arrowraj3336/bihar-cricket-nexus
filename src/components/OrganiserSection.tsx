@@ -103,7 +103,7 @@ const OrganiserSection = () => {
             viewport={{ once: true }}
             className="rounded-2xl border border-border bg-card/80 p-5 md:p-8"
           >
-            <div className="grid grid-cols-3 gap-3 md:gap-6">
+            <div className="grid grid-cols-3 gap-3 md:gap-6 mb-5">
               {teamMembers.slice(0, 3).map((member) => (
                 <div key={member.name} className="flex flex-col items-center text-center">
                   <img
@@ -114,11 +114,13 @@ const OrganiserSection = () => {
                   <span className="text-[9px] sm:text-xs text-accent font-display font-semibold uppercase tracking-wider mb-0.5">
                     {member.role}
                   </span>
-                  <h3 className="font-heading text-xs sm:text-sm md:text-base font-bold text-foreground mb-1">{member.name}</h3>
-                  <p className="text-[9px] sm:text-[10px] md:text-xs text-muted-foreground leading-snug">{member.bio}</p>
+                  <h3 className="font-heading text-xs sm:text-sm md:text-base font-bold text-foreground">{member.name}</h3>
                 </div>
               ))}
             </div>
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed text-center">
+              Visionary sports administrators dedicated to promoting rural cricket talent across Bihar with over 15 years of experience.
+            </p>
           </motion.div>
         </div>
 
