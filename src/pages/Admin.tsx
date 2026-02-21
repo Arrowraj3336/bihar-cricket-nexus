@@ -364,6 +364,8 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
   const [team, setTeam] = useState("");
   const [runs, setRuns] = useState("");
   const [wickets, setWickets] = useState("");
+  const [matchesPlayed, setMatchesPlayed] = useState("");
+  const [matchesWon, setMatchesWon] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -387,12 +389,14 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
         category, name, team,
         runs: parseInt(runs) || 0,
         wickets: parseInt(wickets) || 0,
+        matches_played: parseInt(matchesPlayed) || 0,
+        matches_won: parseInt(matchesWon) || 0,
         photo_url: photoUrl,
         stat_value: statValue,
         stat_label: statLabel,
       });
       toast({ title: "Updated!", description: `${category} cap performer updated.` });
-      setName(""); setTeam(""); setRuns(""); setWickets(""); setPhoto(null);
+      setName(""); setTeam(""); setRuns(""); setWickets(""); setMatchesPlayed(""); setMatchesWon(""); setPhoto(null);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -442,6 +446,14 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
           <div>
             <Label>Wickets</Label>
             <Input type="number" value={wickets} onChange={(e) => setWickets(e.target.value)} placeholder="0" />
+          </div>
+          <div>
+            <Label>Match Played</Label>
+            <Input type="number" value={matchesPlayed} onChange={(e) => setMatchesPlayed(e.target.value)} placeholder="0" />
+          </div>
+          <div>
+            <Label>Match Won</Label>
+            <Input type="number" value={matchesWon} onChange={(e) => setMatchesWon(e.target.value)} placeholder="0" />
           </div>
         </div>
         <div>

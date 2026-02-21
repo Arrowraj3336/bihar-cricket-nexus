@@ -114,6 +114,8 @@ export type Database = {
         Row: {
           category: string
           id: string
+          matches_played: number
+          matches_won: number
           name: string
           photo_url: string | null
           runs: number
@@ -126,6 +128,8 @@ export type Database = {
         Insert: {
           category: string
           id?: string
+          matches_played?: number
+          matches_won?: number
           name: string
           photo_url?: string | null
           runs?: number
@@ -138,6 +142,8 @@ export type Database = {
         Update: {
           category?: string
           id?: string
+          matches_played?: number
+          matches_won?: number
           name?: string
           photo_url?: string | null
           runs?: number

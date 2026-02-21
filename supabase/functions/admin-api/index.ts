@@ -138,6 +138,8 @@ Deno.serve(async (req) => {
         team: body.team,
         runs: body.runs || 0,
         wickets: body.wickets || 0,
+        matches_played: body.matches_played || 0,
+        matches_won: body.matches_won || 0,
         photo_url: body.photo_url || null,
         stat_value: body.stat_value || 0,
         stat_label: body.stat_label || "Runs",
