@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { teamLogoMap } from "@/lib/team-logos";
 
-const TARGET_DATE = new Date("2026-02-26T00:00:00+05:30").getTime();
+const TARGET_DATE = new Date("2026-02-28T00:00:00+05:30").getTime();
 
 const UpcomingMatches = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -103,7 +103,7 @@ const UpcomingMatches = () => {
 
                 <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
                   <span className="flex items-center gap-2 bg-secondary/80 backdrop-blur px-3 py-2 rounded-xl border border-border/50 text-xs md:text-sm">
-                    <Calendar size={14} className="text-accent" /> 26 Feb, 2026
+                    <Calendar size={14} className="text-accent" /> 28 Feb, 2026
                   </span>
                   <span className="flex items-center gap-2 bg-secondary/80 backdrop-blur px-3 py-2 rounded-xl border border-border/50 text-xs md:text-sm">
                     <Clock size={14} className="text-accent" /> 11:00 AM
