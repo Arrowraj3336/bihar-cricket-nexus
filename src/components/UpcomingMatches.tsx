@@ -46,7 +46,7 @@ const UpcomingMatches = () => {
     <section id="matches" className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
       <CricketBat className="absolute top-10 -left-6 w-10 h-32 text-accent opacity-[0.08] -rotate-12" />
       <CricketBall className="absolute bottom-20 -right-8 w-20 h-20 text-primary opacity-[0.08]" />
-      <CricketStumps className="absolute top-1/3 -right-8 w-14 h-24 text-primary opacity-[0.06] hidden md:block" />
+      <CricketStumps className="absolute top-1/3 -right-8 w-14 h-24 text-primary opacity-[0.06]" />
 
       <div className="container">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8 md:mb-10">

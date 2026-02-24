@@ -46,6 +46,7 @@ const GallerySection = () => {
   return (
     <section id="gallery" className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
       <CricketBall className="absolute -bottom-8 -right-8 w-40 h-40 text-primary" />
+      <CricketBat className="absolute top-10 -left-4 w-6 h-20 text-accent opacity-[0.07] rotate-[20deg]" />
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
