@@ -67,7 +67,7 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-background/60">
               <li className="flex items-center gap-2.5"><span>🏏</span><span>16 Teams</span></li>
               <li className="flex items-center gap-2.5"><span>📍</span><span>Darbhanga</span></li>
-              <li className="flex items-center gap-2.5"><span>🏆</span><span>Trials: 21 Feb</span></li>
+              <li className="flex items-center gap-2.5"><span>🏆</span><span>Trials: 28 Feb</span></li>
               <li className="flex items-center gap-2.5"><span>⚡</span><span>T20 Format</span></li>
             </ul>
           </div>
