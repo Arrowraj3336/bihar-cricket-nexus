@@ -129,7 +129,6 @@ Deno.serve(async (req) => {
     if (action === "upsert-performer" && req.method === "POST") {
       const body = await req.json();
       
-      // Delete existing for this category, then insert new
       await supabase.from("top_performers").delete().eq("category", body.category);
       
       const { error } = await supabase.from("top_performers").insert({
@@ -173,6 +172,49 @@ Deno.serve(async (req) => {
       const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(fileName);
 
       return new Response(JSON.stringify({ success: true, url: urlData.publicUrl }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // News: add
+    if (action === "add-news" && req.method === "POST") {
+      const body = await req.json();
+      const { error } = await supabase.from("news").insert({
+        title: body.title,
+        content: body.content,
+        category: body.category || "general",
+        is_pinned: body.is_pinned || false,
+      });
+      if (error) throw error;
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // News: delete
+    if (action === "delete-news" && req.method === "POST") {
+      const { id } = await req.json();
+      const { error } = await supabase.from("news").delete().eq("id", id);
+      if (error) throw error;
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Analytics: get visitor stats
+    if (action === "get-analytics" && req.method === "POST") {
+      // Get all visitor logs
+      const { data: logs, error } = await supabase
+        .from("visitor_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+
+      if (error) throw error;
+
+      return new Response(JSON.stringify({ success: true, data: logs || [] }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

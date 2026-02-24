@@ -43,6 +43,8 @@ const TopPerformers = () => {
               stat: p.stat_value,
               statLabel: p.stat_label,
               details: [
+                { label: "M", value: String(p.matches_played ?? 0) },
+                { label: "W", value: String(p.matches_won ?? 0) },
                 { label: "Runs", value: String(p.runs) },
                 { label: "Wkts", value: String(p.wickets) },
               ],
