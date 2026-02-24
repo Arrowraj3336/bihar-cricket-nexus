@@ -41,33 +41,6 @@ export type Database = {
         }
         Relationships: []
       }
-      news: {
-        Row: {
-          category: string
-          content: string
-          created_at: string
-          id: string
-          is_pinned: boolean
-          title: string
-        }
-        Insert: {
-          category?: string
-          content: string
-          created_at?: string
-          id?: string
-          is_pinned?: boolean
-          title: string
-        }
-        Update: {
-          category?: string
-          content?: string
-          created_at?: string
-          id?: string
-          is_pinned?: boolean
-          title?: string
-        }
-        Relationships: []
-      }
       points_table: {
         Row: {
           id: string
@@ -209,42 +182,6 @@ export type Database = {
           match_time?: string
           team1?: string
           team2?: string
-        }
-        Relationships: []
-      }
-      visitor_logs: {
-        Row: {
-          city: string | null
-          country: string | null
-          created_at: string
-          device_type: string | null
-          id: string
-          page: string
-          referrer: string | null
-          state: string | null
-          user_agent: string | null
-        }
-        Insert: {
-          city?: string | null
-          country?: string | null
-          created_at?: string
-          device_type?: string | null
-          id?: string
-          page?: string
-          referrer?: string | null
-          state?: string | null
-          user_agent?: string | null
-        }
-        Update: {
-          city?: string | null
-          country?: string | null
-          created_at?: string
-          device_type?: string | null
-          id?: string
-          page?: string
-          referrer?: string | null
-          state?: string | null
-          user_agent?: string | null
         }
         Relationships: []
       }
