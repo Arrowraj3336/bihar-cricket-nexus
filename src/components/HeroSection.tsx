@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import heroBatsman from "@/assets/hero-batsman.jpeg";
 import brlLogo from "@/assets/logos/brl-logo-new.png";
-import { CricketBall, CricketStumps } from "./CricketDecorations";
 
 const HeroSection = () => {
   return (
@@ -55,8 +54,6 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      <CricketBall className="absolute bottom-28 right-4 w-12 h-12 text-accent opacity-20" />
-      <CricketStumps className="absolute top-24 left-2 w-8 h-14 text-primary opacity-[0.08]" />
       <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
     </section>
   );

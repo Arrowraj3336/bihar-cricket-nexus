@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Newspaper, Bell, Pin, ChevronRight, Megaphone } from "lucide-react";
-import { CricketBall, CricketBat, CricketStumps } from "./CricketDecorations";
+import { CricketBall, CricketBat } from "./CricketDecorations";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 
@@ -31,7 +31,6 @@ const NewsSection = () => {
     <section className="py-16 md:py-24 bg-background relative overflow-hidden">
       <CricketBall className="absolute -top-8 right-10 w-32 h-32 text-primary opacity-[0.04]" />
       <CricketBat className="absolute bottom-10 -left-4 w-8 h-24 text-accent opacity-[0.06] rotate-12" />
-      <CricketStumps className="absolute bottom-1/3 -right-6 w-12 h-20 text-primary opacity-[0.05]" />
 
       <div className="container relative z-10">
         <motion.div

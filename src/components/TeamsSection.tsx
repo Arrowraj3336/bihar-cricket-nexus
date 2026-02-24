@@ -162,8 +162,8 @@ const TeamsSection = () => {
 
   return (
     <section id="teams" className="py-16 md:py-24 bg-background cricket-ball-pattern relative overflow-hidden">
-      <CricketStumps className="absolute -right-4 top-20 w-16 h-24 text-primary" />
-      <CricketBall className="absolute -left-6 bottom-32 w-16 h-16 text-accent opacity-30" />
+      <CricketStumps className="absolute -right-4 top-20 w-16 h-24 text-primary hidden md:block" />
+      <CricketBall className="absolute -left-6 bottom-32 w-16 h-16 text-accent opacity-30 hidden md:block" />
 
       <div className="container relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8 md:mb-10">

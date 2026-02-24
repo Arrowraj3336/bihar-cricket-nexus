@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Timer } from "lucide-react";
 
-const TARGET_DATE = new Date("2026-02-28T00:00:00+05:30").getTime();
+const TARGET_DATE = new Date("2026-02-21T00:00:00+05:30").getTime();
 
 interface TimeLeft {
   days: number;
@@ -59,7 +59,7 @@ const CountdownTimer = () => {
             The Countdown is <span className="text-gradient-primary">ON</span>
           </h2>
           <p className="text-muted-foreground text-xs sm:text-sm mb-8">
-            28th February 2026 • Nagendrajha Stadium, Darbhanga
+            21st February 2026 • Nagendrajha Stadium, Darbhanga
           </p>
 
           <div className="flex justify-center gap-3 sm:gap-4 md:gap-6">

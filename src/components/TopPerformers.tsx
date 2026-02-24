@@ -14,9 +14,9 @@ const categories: { key: Category; label: string; icon: typeof Trophy; color: st
 ];
 
 const defaultPerformers: Record<Category, { name: string; team: string; stat: number; statLabel: string; details: { label: string; value: string }[] }> = {
-  orange: { name: "Rajesh Kumar", team: "Darbhanga Lions", stat: 487, statLabel: "Runs", details: [{ label: "Matches", value: "10" }, { label: "Highest", value: "89*" }, { label: "Average", value: "54.11" }, { label: "Strike Rate", value: "148.3" }] },
-  purple: { name: "Mohammad Arif", team: "Darbhanga Tigers", stat: 18, statLabel: "Wickets", details: [{ label: "Matches", value: "10" }, { label: "Best", value: "4/22" }, { label: "Average", value: "14.2" }, { label: "Economy", value: "6.8" }] },
-  mvp: { name: "Rajesh Kumar", team: "Darbhanga Lions", stat: 820, statLabel: "Points", details: [{ label: "Matches", value: "10" }, { label: "Runs", value: "487" }, { label: "Wickets", value: "5" }, { label: "Man of Match", value: "4" }] },
+  orange: { name: "Rajesh Kumar", team: "Darbhanga Lions", stat: 487, statLabel: "Runs", details: [{ label: "M", value: "10" }, { label: "HS", value: "89*" }, { label: "Avg", value: "54.11" }, { label: "4/6's", value: "52/18" }, { label: "SR", value: "148.3" }] },
+  purple: { name: "Mohammad Arif", team: "Darbhanga Tigers", stat: 18, statLabel: "Wickets", details: [{ label: "M", value: "10" }, { label: "Best", value: "4/22" }, { label: "Avg", value: "14.2" }, { label: "Econ", value: "6.8" }, { label: "5W", value: "1" }] },
+  mvp: { name: "Rajesh Kumar", team: "Darbhanga Lions", stat: 820, statLabel: "Points", details: [{ label: "M", value: "10" }, { label: "Runs", value: "487" }, { label: "Wkts", value: "5" }, { label: "Ct", value: "8" }, { label: "MoM", value: "4" }] },
 };
 
 const swipeConfidenceThreshold = 10000;
@@ -37,27 +37,17 @@ const TopPerformers = () => {
         data.forEach((p: any) => {
           const cat = p.category as Category;
           if (updated[cat]) {
-            const details: { label: string; value: string }[] = [];
-            details.push({ label: "Matches", value: String(p.matches_played ?? 0) });
-            if (cat === "orange") {
-              details.push({ label: "Highest", value: String(p.runs) });
-              details.push({ label: "Average", value: "—" });
-              details.push({ label: "Strike Rate", value: "—" });
-            } else if (cat === "purple") {
-              details.push({ label: "Best", value: "—" });
-              details.push({ label: "Average", value: "—" });
-              details.push({ label: "Economy", value: "—" });
-            } else {
-              details.push({ label: "Runs", value: String(p.runs) });
-              details.push({ label: "Wickets", value: String(p.wickets) });
-              details.push({ label: "Man of Match", value: "—" });
-            }
             updated[cat] = {
               name: p.name,
               team: p.team,
               stat: p.stat_value,
               statLabel: p.stat_label,
-              details,
+              details: [
+                { label: "M", value: String(p.matches_played ?? 0) },
+                { label: "W", value: String(p.matches_won ?? 0) },
+                { label: "Runs", value: String(p.runs) },
+                { label: "Wkts", value: String(p.wickets) },
+              ],
             };
             if (p.photo_url) photos[cat] = p.photo_url;
           }
@@ -92,9 +82,8 @@ const TopPerformers = () => {
 
   return (
     <section id="performers" className="py-16 md:py-24 bg-background relative overflow-hidden">
-      <CricketBall className="absolute -top-10 right-1/4 w-48 h-48 text-primary" />
+      <CricketBall className="absolute -top-10 right-1/4 w-48 h-48 text-primary hidden md:block" />
       <CricketBall className="absolute bottom-0 left-10 w-32 h-32 text-accent" />
-      <CricketBat className="absolute top-1/2 -left-4 w-8 h-24 text-accent opacity-[0.06] -rotate-12" />
 
       <div className="container relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8">
@@ -151,13 +140,21 @@ const TopPerformers = () => {
                     <span className="text-muted-foreground text-base">{player.statLabel}</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    {player.details.map((d, i) => (
-                      <div key={i} className="flex items-center justify-between bg-secondary/60 rounded-lg px-3 py-2.5 border border-border/40">
-                        <span className="text-xs text-muted-foreground font-display font-semibold">{d.label}</span>
-                        <span className="text-sm font-heading font-bold text-foreground">{d.value}</span>
-                      </div>
-                    ))}
+                  <div className="border border-border/50 rounded-lg overflow-hidden">
+                    <div className="grid grid-cols-2 text-center">
+                      {player.details.map((d, i) => (
+                        <div key={i} className="border-b border-r border-border/50 px-2 py-2 last:border-r-0">
+                          <span className="text-xs text-muted-foreground font-display font-semibold">{d.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 text-center">
+                      {player.details.map((d, i) => (
+                        <div key={i} className="border-r border-border/50 px-2 py-2 last:border-r-0">
+                          <span className="text-sm font-display font-bold">{d.value}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <button className="mt-6 w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 rounded-lg bg-gradient-accent text-primary-foreground font-heading font-semibold text-sm tracking-wider uppercase shadow-glow hover:opacity-90 transition-opacity">

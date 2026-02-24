@@ -647,42 +647,12 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
   const [category, setCategory] = useState<string>("orange");
   const [name, setName] = useState("");
   const [team, setTeam] = useState("");
-  const [statValue, setStatValue] = useState("");
+  const [runs, setRuns] = useState("");
+  const [wickets, setWickets] = useState("");
   const [matchesPlayed, setMatchesPlayed] = useState("");
-  const [detail1, setDetail1] = useState("");
-  const [detail2, setDetail2] = useState("");
-  const [detail3, setDetail3] = useState("");
+  const [matchesWon, setMatchesWon] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const catConfig: Record<string, { statLabel: string; fields: { label: string; placeholder: string }[] }> = {
-    orange: {
-      statLabel: "Total Runs",
-      fields: [
-        { label: "Highest Score", placeholder: "e.g. 89*" },
-        { label: "Average", placeholder: "e.g. 54.11" },
-        { label: "Strike Rate", placeholder: "e.g. 148.3" },
-      ],
-    },
-    purple: {
-      statLabel: "Total Wickets",
-      fields: [
-        { label: "Best Bowling", placeholder: "e.g. 4/22" },
-        { label: "Average", placeholder: "e.g. 14.2" },
-        { label: "Economy", placeholder: "e.g. 6.8" },
-      ],
-    },
-    mvp: {
-      statLabel: "MVP Points",
-      fields: [
-        { label: "Runs Scored", placeholder: "e.g. 487" },
-        { label: "Wickets Taken", placeholder: "e.g. 5" },
-        { label: "Man of Match", placeholder: "e.g. 4" },
-      ],
-    },
-  };
-
-  const config = catConfig[category];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -696,20 +666,17 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
         const uploadRes = await adminApi("upload-performer-photo", password, formData);
         photoUrl = uploadRes.url;
       }
-      const sv = parseInt(statValue) || 0;
+      const statValue = category === "purple" ? parseInt(wickets) || 0 : parseInt(runs) || 0;
       const statLabel = category === "purple" ? "Wickets" : category === "mvp" ? "Points" : "Runs";
 
       await adminApi("upsert-performer", password, {
         category, name, team,
-        runs: category === "mvp" ? (parseInt(detail1) || 0) : sv,
-        wickets: category === "mvp" ? (parseInt(detail2) || 0) : 0,
-        matches_played: parseInt(matchesPlayed) || 0,
-        matches_won: 0,
-        photo_url: photoUrl, stat_value: sv, stat_label: statLabel,
+        runs: parseInt(runs) || 0, wickets: parseInt(wickets) || 0,
+        matches_played: parseInt(matchesPlayed) || 0, matches_won: parseInt(matchesWon) || 0,
+        photo_url: photoUrl, stat_value: statValue, stat_label: statLabel,
       });
       toast({ title: "Updated!", description: `${category} cap performer updated.` });
-      setName(""); setTeam(""); setStatValue(""); setMatchesPlayed("");
-      setDetail1(""); setDetail2(""); setDetail3(""); setPhoto(null);
+      setName(""); setTeam(""); setRuns(""); setWickets(""); setMatchesPlayed(""); setMatchesWon(""); setPhoto(null);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -719,10 +686,10 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
 
   return (
     <AdminSection icon={Star} title="Top Performers" subtitle="Manage Orange Cap, Purple Cap & MVP" accentColor="text-cricket-orange">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Category</Label>
-          <Select value={category} onValueChange={(v) => { setCategory(v); setDetail1(""); setDetail2(""); setDetail3(""); }}>
+          <Select value={category} onValueChange={setCategory}>
             <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="orange">🟠 Orange Cap (Most Runs)</SelectItem>
@@ -731,10 +698,9 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
             </SelectContent>
           </Select>
         </div>
-
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Player Name</Label>
+            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Name</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Player name" className="mt-1" />
           </div>
           <div>
@@ -744,41 +710,23 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
               <SelectContent>{TEAM_NAMES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-        </div>
-
-        {/* Primary stat + matches */}
-        <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">{config.statLabel}</Label>
-            <Input type="number" value={statValue} onChange={(e) => setStatValue(e.target.value)} placeholder="0" className="mt-1" />
+            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Runs</Label>
+            <Input type="number" value={runs} onChange={(e) => setRuns(e.target.value)} placeholder="0" className="mt-1" />
           </div>
           <div>
-            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Matches Played</Label>
+            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Wickets</Label>
+            <Input type="number" value={wickets} onChange={(e) => setWickets(e.target.value)} placeholder="0" className="mt-1" />
+          </div>
+          <div>
+            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Match Played</Label>
             <Input type="number" value={matchesPlayed} onChange={(e) => setMatchesPlayed(e.target.value)} placeholder="0" className="mt-1" />
           </div>
-        </div>
-
-        {/* Category-specific detail fields */}
-        <div className="bg-secondary/30 rounded-xl border border-border/50 p-4 space-y-3">
-          <h4 className="font-heading text-xs font-bold text-muted-foreground uppercase tracking-widest">
-            {category === "orange" ? "🟠" : category === "purple" ? "🟣" : "⭐"} Additional Stats
-          </h4>
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label className="text-[10px] font-display font-semibold uppercase tracking-wider text-muted-foreground">{config.fields[0].label}</Label>
-              <Input value={detail1} onChange={(e) => setDetail1(e.target.value)} placeholder={config.fields[0].placeholder} className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-[10px] font-display font-semibold uppercase tracking-wider text-muted-foreground">{config.fields[1].label}</Label>
-              <Input value={detail2} onChange={(e) => setDetail2(e.target.value)} placeholder={config.fields[1].placeholder} className="mt-1" />
-            </div>
-            <div>
-              <Label className="text-[10px] font-display font-semibold uppercase tracking-wider text-muted-foreground">{config.fields[2].label}</Label>
-              <Input value={detail3} onChange={(e) => setDetail3(e.target.value)} placeholder={config.fields[2].placeholder} className="mt-1" />
-            </div>
+          <div>
+            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Match Won</Label>
+            <Input type="number" value={matchesWon} onChange={(e) => setMatchesWon(e.target.value)} placeholder="0" className="mt-1" />
           </div>
         </div>
-
         <div>
           <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Player Photo</Label>
           <Input type="file" accept="image/*" onChange={(e) => setPhoto(e.target.files?.[0] || null)} className="mt-1" />
