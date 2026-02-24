@@ -6,7 +6,6 @@ import UpcomingMatches from "@/components/UpcomingMatches";
 import TopPerformers from "@/components/TopPerformers";
 import GallerySection from "@/components/GallerySection";
 import NewsSection from "@/components/NewsSection";
-import ScoreboardNews from "@/components/ScoreboardNews";
 import OrganiserSection from "@/components/OrganiserSection";
 import Footer from "@/components/Footer";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
@@ -23,7 +22,6 @@ const Index = () => {
       <UpcomingMatches />
       <TopPerformers />
       <GallerySection />
-      <ScoreboardNews />
       <NewsSection />
       <OrganiserSection />
       <Footer />
