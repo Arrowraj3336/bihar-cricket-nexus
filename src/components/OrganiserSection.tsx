@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Users, Award, ArrowRight } from "lucide-react";
+import { CricketBall, CricketBat, CricketStumps } from "./CricketDecorations";
 import { Link } from "react-router-dom";
 import organiserImg from "@/assets/organiser-anand-thakur-new.jpeg";
 import convenerImg from "@/assets/convener-gyaneshwar.jpeg";
@@ -70,10 +71,12 @@ const teamMembers = [
 const OrganiserSection = () => {
   return (
     <section id="organiser" className="py-16 md:py-24 bg-background relative overflow-hidden">
-      {/* Subtle background decorations */}
       <div className="absolute inset-0 cricket-ball-pattern opacity-50" />
       <div className="absolute top-10 right-0 w-40 h-40 rounded-full bg-primary/5 blur-3xl" />
       <div className="absolute bottom-10 left-0 w-40 h-40 rounded-full bg-accent/5 blur-3xl" />
+      <CricketBall className="absolute top-16 -right-6 w-20 h-20 text-primary opacity-[0.06]" />
+      <CricketStumps className="absolute bottom-20 -left-4 w-10 h-16 text-accent opacity-[0.06]" />
+      <CricketBat className="absolute top-1/2 -right-3 w-6 h-20 text-accent opacity-[0.05] rotate-[15deg]" />
 
       <div className="container relative z-10">
         {/* Section Header */}

@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { teamLogoMap } from "@/lib/team-logos";
 
-const TARGET_DATE = new Date("2026-02-26T00:00:00+05:30").getTime();
+const TARGET_DATE = new Date("2026-02-28T00:00:00+05:30").getTime();
 
 const UpcomingMatches = () => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -46,7 +46,7 @@ const UpcomingMatches = () => {
     <section id="matches" className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
       <CricketBat className="absolute top-10 -left-6 w-10 h-32 text-accent opacity-[0.08] -rotate-12" />
       <CricketBall className="absolute bottom-20 -right-8 w-20 h-20 text-primary opacity-[0.08]" />
-      <CricketStumps className="absolute top-1/3 -right-8 w-14 h-24 text-primary opacity-[0.06] hidden md:block" />
+      <CricketStumps className="absolute top-1/3 -right-8 w-14 h-24 text-primary opacity-[0.06]" />
 
       <div className="container">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8 md:mb-10">
@@ -103,7 +103,7 @@ const UpcomingMatches = () => {
 
                 <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
                   <span className="flex items-center gap-2 bg-secondary/80 backdrop-blur px-3 py-2 rounded-xl border border-border/50 text-xs md:text-sm">
-                    <Calendar size={14} className="text-accent" /> 26 Feb, 2026
+                    <Calendar size={14} className="text-accent" /> 28 Feb, 2026
                   </span>
                   <span className="flex items-center gap-2 bg-secondary/80 backdrop-blur px-3 py-2 rounded-xl border border-border/50 text-xs md:text-sm">
                     <Clock size={14} className="text-accent" /> 11:00 AM
