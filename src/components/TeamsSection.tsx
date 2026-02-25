@@ -102,7 +102,12 @@ const TeamBadge = ({ team, size = "card" }: { team: TeamData; size?: "card" | "t
 const TeamsSection = () => {
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(0);
-  const [teams, setTeams] = useState<TeamData[]>([]);
+  const [teams, setTeams] = useState<TeamData[]>(
+    defaultTeams.map(name => ({
+      name, abbr: abbrMap[name] || "??", color: colorMap[name] || "hsl(0 0% 50%)",
+      logo: logoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
+    }))
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -158,7 +163,7 @@ const TeamsSection = () => {
     exit: (dir: number) => ({ x: dir < 0 ? 300 : -300, opacity: 0 }),
   };
 
-  if (teams.length === 0) return null;
+  
 
   return (
     <section id="teams" className="py-16 md:py-24 bg-background cricket-ball-pattern relative overflow-hidden">
