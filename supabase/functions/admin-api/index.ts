@@ -10,8 +10,15 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-  const providedPassword = req.headers.get("x-admin-password");
+  const adminPassword = (Deno.env.get("ADMIN_PASSWORD") ?? "").trim().normalize("NFKC");
+  const providedPassword = (req.headers.get("x-admin-password") ?? "").trim().normalize("NFKC");
+
+  if (!adminPassword) {
+    return new Response(JSON.stringify({ error: "Admin password is not configured" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
   if (!providedPassword || providedPassword !== adminPassword) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
