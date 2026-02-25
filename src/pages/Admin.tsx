@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminApi } from "@/lib/admin-api";
 import { TEAM_NAMES } from "@/lib/teams-list";
@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Lock, Upload, Trophy, Calendar, Star, Trash2, Image, X,
-  BarChart3, Users, MapPin, Smartphone, Monitor, Tablet,
-  TrendingUp, Eye, Globe, Shield,
+  Upload, Trophy, Calendar, Star, Trash2, Image, X,
+  BarChart3, Users, MapPin, Smartphone,
+  TrendingUp, Eye, Globe, Shield, ScanLine,
 } from "lucide-react";
 import { CricketBall, CricketBat, CricketStumps } from "@/components/CricketDecorations";
 import {
@@ -20,15 +20,78 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, ResponsiveContainer } from "recharts";
 
+const JarvisBootScreen = () => (
+  <div className="min-h-screen bg-background relative flex items-center justify-center overflow-hidden p-4">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.2),transparent_60%)]" />
+    <CricketBall className="absolute top-10 right-10 w-36 h-36 text-primary opacity-[0.06]" />
+    <CricketBat className="absolute bottom-12 left-8 w-10 h-28 text-accent opacity-[0.06] -rotate-12" />
+
+    <div className="relative z-10 flex flex-col items-center">
+      <div className="relative w-72 h-72 md:w-80 md:h-80 flex items-center justify-center">
+        <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse" />
+        <div className="absolute inset-6 rounded-full border border-accent/40 animate-[spin_7s_linear_infinite]" />
+        <div className="absolute inset-14 rounded-full border border-primary/40 animate-[spin_5s_linear_infinite_reverse]" />
+        <div className="absolute inset-20 rounded-full border border-accent/60" />
+        <div className="w-16 h-16 rounded-full bg-gradient-accent shadow-glow flex items-center justify-center animate-pulse">
+          <ScanLine size={26} className="text-primary-foreground" />
+        </div>
+      </div>
+
+      <div className="text-center -mt-8">
+        <p className="text-[10px] font-display uppercase tracking-[0.35em] text-accent">J.A.R.V.I.S Protocol</p>
+        <h2 className="font-heading text-xl md:text-2xl font-bold mt-2">Access Granted</h2>
+        <p className="text-xs text-muted-foreground font-display mt-1">Initializing Command Console...</p>
+      </div>
+    </div>
+  </div>
+);
+
 const AdminPanel = () => {
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [showBootSequence, setShowBootSequence] = useState(false);
+  const bootTimeoutRef = useRef<number | null>(null);
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    return () => {
+      if (bootTimeoutRef.current !== null) {
+        window.clearTimeout(bootTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.trim()) setAuthenticated(true);
+    const normalizedPassword = password.trim();
+    if (!normalizedPassword || isAuthenticating) return;
+
+    setIsAuthenticating(true);
+    setLoginError("");
+
+    try {
+      await adminApi("verify-auth", normalizedPassword);
+      setPassword(normalizedPassword);
+      setShowBootSequence(true);
+
+      bootTimeoutRef.current = window.setTimeout(() => {
+        setAuthenticated(true);
+        setShowBootSequence(false);
+      }, 1800);
+    } catch {
+      setAuthenticated(false);
+      setShowBootSequence(false);
+      setLoginError("Wrong password. Please try again.");
+    } finally {
+      setIsAuthenticating(false);
+    }
   };
+
+  if (showBootSequence && !authenticated) {
+    return <JarvisBootScreen />;
+  }
 
   if (!authenticated) {
     return (
@@ -48,9 +111,30 @@ const AdminPanel = () => {
           </div>
           <div>
             <Label htmlFor="password" className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Admin Password</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter admin password" required className="mt-1" />
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (loginError) setLoginError("");
+              }}
+              placeholder="Enter admin password"
+              autoComplete="current-password"
+              required
+              className="mt-1"
+            />
           </div>
-          <Button type="submit" className="w-full bg-gradient-accent shadow-glow font-heading uppercase tracking-wider">Enter Dashboard</Button>
+
+          {loginError && (
+            <p className="text-xs text-destructive font-display" role="alert" aria-live="polite">
+              {loginError}
+            </p>
+          )}
+
+          <Button type="submit" disabled={isAuthenticating} className="w-full bg-gradient-accent shadow-glow font-heading uppercase tracking-wider">
+            {isAuthenticating ? "Checking Password..." : "Enter Dashboard"}
+          </Button>
         </form>
       </div>
     );
@@ -73,7 +157,21 @@ const AdminPanel = () => {
               <p className="text-[10px] text-muted-foreground font-display">Management Dashboard</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => { setAuthenticated(false); setPassword(""); }} className="font-display text-xs">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (bootTimeoutRef.current !== null) {
+                window.clearTimeout(bootTimeoutRef.current);
+                bootTimeoutRef.current = null;
+              }
+              setAuthenticated(false);
+              setShowBootSequence(false);
+              setLoginError("");
+              setPassword("");
+            }}
+            className="font-display text-xs"
+          >
             Logout
           </Button>
         </div>
