@@ -176,54 +176,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // News: add
-    if (action === "add-news" && req.method === "POST") {
-      const body = await req.json();
-      const { error } = await supabase.from("news").insert({
-        title: body.title,
-        content: body.content,
-        category: body.category || "general",
-        is_pinned: body.is_pinned || false,
-      });
-      if (error) throw error;
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Scoreboard: add
-    if (action === "add-scoreboard" && req.method === "POST") {
-      const body = await req.json();
-      const { error } = await supabase.from("scoreboard_updates").insert({
-        message: body.message,
-      });
-      if (error) throw error;
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Scoreboard: delete
-    if (action === "delete-scoreboard" && req.method === "POST") {
-      const { id } = await req.json();
-      const { error } = await supabase.from("scoreboard_updates").delete().eq("id", id);
-      if (error) throw error;
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // News: delete
-    if (action === "delete-news" && req.method === "POST") {
-      const { id } = await req.json();
-      const { error } = await supabase.from("news").delete().eq("id", id);
-      if (error) throw error;
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     // Analytics: get visitor stats
     if (action === "get-analytics" && req.method === "POST") {
