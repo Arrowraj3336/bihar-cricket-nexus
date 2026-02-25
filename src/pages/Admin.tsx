@@ -67,11 +67,53 @@ function polarToCart(cx: number, cy: number, r: number, angle: number) {
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 }
 
+/* ── Audio helpers ── */
+const playBeep = (freq: number, duration: number, volume = 0.08) => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.value = volume;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch {}
+};
+
+const playBootSequence = () => {
+  playBeep(440, 0.15, 0.06);
+  setTimeout(() => playBeep(587, 0.12, 0.05), 300);
+  setTimeout(() => playBeep(880, 0.2, 0.07), 800);
+  setTimeout(() => playBeep(1174, 0.15, 0.05), 1600);
+  setTimeout(() => playBeep(1760, 0.3, 0.04), 2800);
+  // Low hum
+  setTimeout(() => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.value = 60;
+      gain.gain.value = 0.02;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2);
+      osc.start();
+      osc.stop(ctx.currentTime + 2);
+    } catch {}
+  }, 200);
+};
+
 /* ── JARVIS Boot Screen ── */
 const JarvisBootScreen = () => {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
+    playBootSequence();
     const timers = [
       setTimeout(() => setPhase(1), 300),
       setTimeout(() => setPhase(2), 1000),
@@ -323,6 +365,7 @@ const PinKeypad = ({ onComplete, error, isLoading }: { onComplete: (pin: string)
 
   const handleDigit = (digit: string) => {
     if (pin.length >= PIN_LENGTH || isLoading) return;
+    playBeep(800 + parseInt(digit) * 80, 0.08, 0.04);
     const newPin = pin + digit;
     setPin(newPin);
     if (newPin.length === PIN_LENGTH) {
@@ -423,7 +466,7 @@ const AdminPanel = () => {
     setLoginError("");
 
     try {
-      await adminApi("verify-auth", enteredPin);
+      const result = await adminApi("verify-auth", enteredPin);
       setPin(enteredPin);
       setShowBootSequence(true);
 
