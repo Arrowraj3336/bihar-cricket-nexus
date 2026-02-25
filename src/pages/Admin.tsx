@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { adminApi } from "@/lib/admin-api";
 import { TEAM_NAMES } from "@/lib/teams-list";
@@ -20,31 +21,295 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, ResponsiveContainer } from "recharts";
 
-const JarvisBootScreen = () => (
-  <div className="min-h-screen bg-background relative flex items-center justify-center overflow-hidden p-4">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.2),transparent_60%)]" />
-    <CricketBall className="absolute top-10 right-10 w-36 h-36 text-primary opacity-[0.06]" />
-    <CricketBat className="absolute bottom-12 left-8 w-10 h-28 text-accent opacity-[0.06] -rotate-12" />
+/* ── Holographic Particle ── */
+const HoloParticle = ({ delay, x, y }: { delay: number; x: number; y: number }) => (
+  <motion.div
+    className="absolute w-1 h-1 rounded-full"
+    style={{ left: `${x}%`, top: `${y}%`, background: "hsl(0, 85%, 50%)", boxShadow: "0 0 6px hsl(0, 85%, 40%)" }}
+    initial={{ opacity: 0, scale: 0 }}
+    animate={{ opacity: [0, 0.8, 0], scale: [0, 1.5, 0], y: [0, -30, -60] }}
+    transition={{ delay, duration: 2.5, repeat: Infinity, ease: "easeOut" }}
+  />
+);
 
-    <div className="relative z-10 flex flex-col items-center">
-      <div className="relative w-72 h-72 md:w-80 md:h-80 flex items-center justify-center">
-        <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse" />
-        <div className="absolute inset-6 rounded-full border border-accent/40 animate-[spin_7s_linear_infinite]" />
-        <div className="absolute inset-14 rounded-full border border-primary/40 animate-[spin_5s_linear_infinite_reverse]" />
-        <div className="absolute inset-20 rounded-full border border-accent/60" />
-        <div className="w-16 h-16 rounded-full bg-gradient-accent shadow-glow flex items-center justify-center animate-pulse">
-          <ScanLine size={26} className="text-primary-foreground" />
-        </div>
-      </div>
-
-      <div className="text-center -mt-8">
-        <p className="text-[10px] font-display uppercase tracking-[0.35em] text-accent">J.A.R.V.I.S Protocol</p>
-        <h2 className="font-heading text-xl md:text-2xl font-bold mt-2">Access Granted</h2>
-        <p className="text-xs text-muted-foreground font-display mt-1">Initializing Command Console...</p>
-      </div>
-    </div>
+/* ── Glitch Text ── */
+const GlitchText = ({ text, className = "" }: { text: string; className?: string }) => (
+  <div className={`relative inline-block ${className}`}>
+    <span className="relative z-10">{text}</span>
+    <motion.span
+      className="absolute inset-0 z-20"
+      style={{ color: "hsl(0, 100%, 40%)", clipPath: "inset(0 0 60% 0)" }}
+      animate={{ x: [0, -3, 2, 0], opacity: [1, 0.7, 1] }}
+      transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 2.5 }}
+    >
+      {text}
+    </motion.span>
+    <motion.span
+      className="absolute inset-0 z-20"
+      style={{ color: "hsl(350, 80%, 35%)", clipPath: "inset(60% 0 0 0)" }}
+      animate={{ x: [0, 3, -2, 0], opacity: [1, 0.5, 1] }}
+      transition={{ duration: 0.12, repeat: Infinity, repeatDelay: 3 }}
+    >
+      {text}
+    </motion.span>
   </div>
 );
+
+/* ── Arc SVG helper ── */
+function describeArc(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
+  const s = polarToCart(cx, cy, r, endAngle);
+  const e = polarToCart(cx, cy, r, startAngle);
+  const large = endAngle - startAngle <= 180 ? "0" : "1";
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 0 ${e.x} ${e.y}`;
+}
+function polarToCart(cx: number, cy: number, r: number, angle: number) {
+  const rad = ((angle - 90) * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+/* ── JARVIS Boot Screen ── */
+const JarvisBootScreen = () => {
+  const [phase, setPhase] = useState(0);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setPhase(1), 300),
+      setTimeout(() => setPhase(2), 1000),
+      setTimeout(() => setPhase(3), 2000),
+      setTimeout(() => setPhase(4), 3200),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const particles = useMemo(
+    () => Array.from({ length: 40 }, (_, i) => ({ id: i, x: Math.random() * 100, y: Math.random() * 100, delay: Math.random() * 3 })),
+    []
+  );
+
+  const dataLines = [
+    "SYS.KERNEL >> BOOTING CORE v4.2.1...",
+    "NEURAL_LINK >> HANDSHAKE ESTABLISHED",
+    "FIREWALL >> PERIMETER SECURED",
+    "HUD_ENGINE >> RENDERING OVERLAY...",
+    "BIOMETRICS >> IDENTITY CONFIRMED",
+    "QUANTUM_NET >> SYNC COMPLETE",
+  ];
+
+  return (
+    <div className="min-h-screen relative flex flex-col items-center justify-center overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #0a0000 0%, #120505 40%, #0d0208 100%)" }}
+    >
+      {/* Grid overlay */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `linear-gradient(hsl(0,85%,30%,0.4) 1px, transparent 1px), linear-gradient(90deg, hsl(0,85%,30%,0.4) 1px, transparent 1px)`,
+        backgroundSize: "50px 50px",
+      }} />
+
+      {/* Scan line */}
+      <motion.div
+        className="absolute left-0 right-0 h-[1px]"
+        style={{ background: "linear-gradient(90deg, transparent, hsl(0,85%,40%,0.5), transparent)" }}
+        animate={{ top: ["0%", "100%", "0%"] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+      />
+
+      {/* Holographic particles */}
+      {particles.map((p) => (
+        <HoloParticle key={p.id} delay={p.delay} x={p.x} y={p.y} />
+      ))}
+
+      {/* Corner brackets */}
+      {[
+        "top-3 left-3 border-t-2 border-l-2",
+        "top-3 right-3 border-t-2 border-r-2",
+        "bottom-3 left-3 border-b-2 border-l-2",
+        "bottom-3 right-3 border-b-2 border-r-2",
+      ].map((pos, i) => (
+        <motion.div
+          key={i}
+          className={`absolute w-6 h-6 ${pos}`}
+          style={{ borderColor: "hsl(0,85%,30%,0.4)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 + i * 0.08 }}
+        />
+      ))}
+
+      {/* Left data stream */}
+      <div className="absolute left-4 top-12 space-y-1">
+        {dataLines.map((line, i) => (
+          <motion.p
+            key={i}
+            className="text-[8px] font-mono tracking-wider"
+            style={{ color: "hsl(0,85%,40%,0.45)" }}
+            initial={{ opacity: 0, x: -15 }}
+            animate={{ opacity: phase >= 1 ? 1 : 0, x: phase >= 1 ? 0 : -15 }}
+            transition={{ delay: i * 0.12, duration: 0.25 }}
+          >
+            {line}
+          </motion.p>
+        ))}
+      </div>
+
+      {/* Right status dots */}
+      <div className="absolute right-4 top-12 space-y-2">
+        {["CORE", "AUTH", "HUD", "NET"].map((label, i) => (
+          <motion.div key={i} className="flex items-center gap-2"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: phase >= 2 ? 1 : 0, x: phase >= 2 ? 0 : 15 }}
+            transition={{ delay: i * 0.1 }}
+          >
+            <span className="text-[8px] font-mono tracking-[0.2em]" style={{ color: "hsl(0,70%,45%,0.5)" }}>{label}</span>
+            <motion.div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: phase >= 3 ? "hsl(0,85%,45%)" : "hsl(0,50%,30%,0.3)" }}
+              animate={phase >= 3 ? { boxShadow: ["0 0 4px hsl(0,85%,45%)", "0 0 14px hsl(0,85%,50%)", "0 0 4px hsl(0,85%,45%)"] } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Center HUD */}
+      <div className="relative flex items-center justify-center w-64 h-64 md:w-72 md:h-72">
+        {/* Outer rotating ring */}
+        <motion.div
+          className="absolute w-56 h-56 md:w-64 md:h-64 rounded-full"
+          style={{ border: "1px solid hsl(0,85%,30%,0.2)" }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        >
+          {[0, 60, 120, 180, 240, 300].map((deg) => (
+            <div key={deg} className="absolute w-1.5 h-1.5 rounded-full"
+              style={{
+                background: "hsl(0,85%,45%,0.7)",
+                boxShadow: "0 0 8px hsl(0,85%,40%,0.5)",
+                top: "50%", left: "50%",
+                transform: `rotate(${deg}deg) translateY(-${window.innerWidth < 768 ? 112 : 128}px) translate(-50%,-50%)`,
+              }}
+            />
+          ))}
+        </motion.div>
+
+        {/* Inner arc segments */}
+        <motion.svg className="absolute w-44 h-44 md:w-48 md:h-48" viewBox="0 0 100 100"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+        >
+          {[0, 90, 180, 270].map((a) => (
+            <path key={a} d={describeArc(50, 50, 42, a, a + 60)} fill="none" stroke="hsl(0,85%,35%,0.3)" strokeWidth="1.5" strokeLinecap="round" />
+          ))}
+        </motion.svg>
+
+        {/* Middle dashed ring */}
+        <motion.div
+          className="absolute w-36 h-36 md:w-40 md:h-40 rounded-full"
+          style={{ border: "1px dashed hsl(0,60%,30%,0.15)" }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Core glow pulse */}
+        <motion.div
+          className="absolute w-24 h-24 rounded-full"
+          style={{ background: "radial-gradient(circle, hsl(0,85%,35%,0.12) 0%, transparent 70%)" }}
+          animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Center icon */}
+        <motion.div
+          className="relative z-10 w-16 h-16 rounded-full flex items-center justify-center"
+          style={{
+            background: "radial-gradient(circle, hsl(0,85%,30%,0.15) 0%, transparent 70%)",
+            boxShadow: "0 0 30px hsl(0,85%,30%,0.2), inset 0 0 15px hsl(0,85%,30%,0.08)",
+          }}
+          animate={{ boxShadow: ["0 0 25px hsl(0,85%,30%,0.15)", "0 0 50px hsl(0,85%,30%,0.35)", "0 0 25px hsl(0,85%,30%,0.15)"] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+        >
+          <ScanLine size={28} style={{ color: "hsl(0,85%,50%)" }} />
+        </motion.div>
+      </div>
+
+      {/* Greeting with glitch */}
+      <motion.div
+        className="mt-5"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: phase >= 1 ? 1 : 0, y: phase >= 1 ? 0 : 15 }}
+        transition={{ duration: 0.4 }}
+      >
+        <GlitchText
+          text="Hello, Raaz"
+          className="text-2xl md:text-3xl font-heading font-bold tracking-[0.12em] uppercase"
+          // Styles applied via inline in GlitchText's parent span color
+        />
+      </motion.div>
+
+      {/* JARVIS Initializing */}
+      <motion.div className="mt-4 flex flex-col items-center gap-2">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase >= 2 ? 1 : 0 }}
+        >
+          <GlitchText
+            text="J.A.R.V.I.S — INITIALIZING"
+            className="text-[10px] font-mono tracking-[0.4em] uppercase"
+          />
+        </motion.div>
+
+        {/* Progress bar */}
+        <motion.div
+          className="w-52 h-[2px] rounded-full overflow-hidden mt-1"
+          style={{ background: "hsl(0,85%,30%,0.15)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase >= 2 ? 1 : 0 }}
+        >
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, hsl(0,85%,40%), hsl(350,70%,35%))" }}
+            initial={{ width: "0%" }}
+            animate={{ width: phase >= 2 ? "100%" : "0%" }}
+            transition={{ duration: 2.2, ease: "easeInOut" }}
+          />
+        </motion.div>
+
+        <motion.p
+          className="text-[9px] font-mono tracking-wider"
+          style={{ color: "hsl(0,85%,50%,0.7)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: phase >= 4 ? 1 : 0 }}
+        >
+          ● ACCESS GRANTED — ALL SYSTEMS ONLINE
+        </motion.p>
+      </motion.div>
+
+      {/* Bottom bar */}
+      <motion.div
+        className="absolute bottom-4 left-4 right-4 flex justify-between items-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: phase >= 1 ? 1 : 0 }}
+      >
+        <p className="text-[7px] font-mono" style={{ color: "hsl(0,60%,40%,0.3)" }}>BRL.SYS.v4.2.1</p>
+        <p className="text-[7px] font-mono" style={{ color: "hsl(0,60%,40%,0.3)" }}>BIHAR RURAL LEAGUE — SECURE ACCESS</p>
+        <motion.p className="text-[7px] font-mono" style={{ color: "hsl(0,85%,45%,0.4)" }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          ● LIVE
+        </motion.p>
+      </motion.div>
+
+      {/* Global text color for glitch children */}
+      <style>{`
+        .relative.inline-block > span:first-child {
+          color: hsl(0, 85%, 50%);
+        }
+      `}</style>
+    </div>
+  );
+};
 
 const PIN_LENGTH = 4;
 
@@ -165,7 +430,7 @@ const AdminPanel = () => {
       bootTimeoutRef.current = window.setTimeout(() => {
         setAuthenticated(true);
         setShowBootSequence(false);
-      }, 800);
+      }, 4500);
     } catch {
       setAuthenticated(false);
       setShowBootSequence(false);
