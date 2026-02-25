@@ -110,13 +110,19 @@ const TeamsSection = () => {
   );
 
   useEffect(() => {
+    let isMounted = true;
+
     const load = async () => {
-      const { data } = await supabase.from("points_table").select("*").order("points", { ascending: false });
-      
+      const { data, error } = await supabase
+        .from("points_table")
+        .select("*")
+        .order("points", { ascending: false });
+
+      if (error || !isMounted) return;
+
       if (data && data.length > 0) {
-        // Merge DB data with defaults
-        const dbMap = new Map(data.map(d => [d.team_name, d]));
-        const merged = defaultTeams.map(name => {
+        const dbMap = new Map(data.map((d) => [d.team_name, d]));
+        const merged = defaultTeams.map((name) => {
           const db = dbMap.get(name);
           return {
             name,
@@ -129,17 +135,44 @@ const TeamsSection = () => {
             pts: db?.points || 0,
           };
         });
-        // Sort by points descending
+
         merged.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
         setTeams(merged);
-      } else {
-        setTeams(defaultTeams.map(name => ({
-          name, abbr: abbrMap[name] || "??", color: colorMap[name] || "hsl(0 0% 50%)",
-          logo: logoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
-        })));
+        return;
       }
+
+      setTeams(defaultTeams.map((name) => ({
+        name,
+        abbr: abbrMap[name] || "??",
+        color: colorMap[name] || "hsl(0 0% 50%)",
+        logo: logoMap[name] || "",
+        played: 0,
+        won: 0,
+        lost: 0,
+        pts: 0,
+      })));
     };
+
     load();
+
+    const channel = supabase
+      .channel("points-table-live")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "points_table" },
+        () => {
+          load();
+        },
+      )
+      .subscribe();
+
+    const refreshInterval = window.setInterval(load, 15000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(refreshInterval);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const totalPages = Math.ceil(teams.length / TEAMS_PER_PAGE);

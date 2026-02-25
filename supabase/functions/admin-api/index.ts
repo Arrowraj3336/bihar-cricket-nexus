@@ -29,6 +29,13 @@ Deno.serve(async (req) => {
   const action = url.searchParams.get("action");
 
   try {
+    // Auth check endpoint for admin login
+    if (action === "verify-auth" && req.method === "POST") {
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Gallery: upload image
     if (action === "upload-gallery" && req.method === "POST") {
       const formData = await req.formData();
