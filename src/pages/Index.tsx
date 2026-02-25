@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import CricketLoader from "@/components/CricketLoader";
+
 import HeroSection from "@/components/HeroSection";
 import TeamsSection from "@/components/TeamsSection";
 import UpcomingMatches from "@/components/UpcomingMatches";
@@ -14,7 +14,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <CricketLoader />
+      
       <Navbar />
       <HeroSection />
       <TeamsSection />
