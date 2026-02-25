@@ -15,15 +15,44 @@ const alertConfig: Record<AlertType, { icon: typeof Bell; dot: string; badge: st
 
 /* Spiral binding holes along the top */
 const SpiralBinding = ({ count = 14 }: { count?: number }) => (
-  <div className="flex items-center justify-center gap-[6px] md:gap-3 px-4 py-2 relative z-10">
+  <div className="flex items-center justify-center gap-[6px] md:gap-3 px-4 py-3 relative z-10">
     {Array.from({ length: count }).map((_, i) => (
       <div key={i} className="flex flex-col items-center">
-        {/* The spiral ring */}
-        <div className="w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-muted-foreground/25 bg-background relative">
-          <div className="absolute inset-[3px] md:inset-1 rounded-full bg-muted-foreground/10" />
+        {/* 3D spiral ring */}
+        <div
+          className="w-5 h-5 md:w-6 md:h-6 rounded-full relative"
+          style={{
+            background: `linear-gradient(145deg, hsl(0 0% 82%), hsl(0 0% 68%))`,
+            boxShadow: `
+              inset 1px 1px 2px hsl(0 0% 90%),
+              inset -1px -1px 2px hsl(0 0% 50%),
+              0 2px 4px hsl(0 0% 0% / 0.2),
+              0 1px 2px hsl(0 0% 0% / 0.15)
+            `,
+          }}
+        >
+          {/* Inner hole */}
+          <div
+            className="absolute inset-[4px] md:inset-[5px] rounded-full"
+            style={{
+              background: `linear-gradient(180deg, hsl(0 0% 96%) 0%, hsl(0 0% 88%) 100%)`,
+              boxShadow: `inset 0 1px 3px hsl(0 0% 0% / 0.15)`,
+            }}
+          />
+          {/* Highlight gleam */}
+          <div
+            className="absolute top-[2px] left-[3px] w-[6px] h-[3px] rounded-full"
+            style={{ background: `hsl(0 0% 100% / 0.5)` }}
+          />
         </div>
         {/* Wire connecting into page */}
-        <div className="w-[2px] h-2 bg-muted-foreground/15 -mt-[1px]" />
+        <div
+          className="w-[2.5px] h-2.5 -mt-[1px] rounded-b-sm"
+          style={{
+            background: `linear-gradient(90deg, hsl(0 0% 65%), hsl(0 0% 78%), hsl(0 0% 65%))`,
+            boxShadow: `1px 0 2px hsl(0 0% 0% / 0.1)`,
+          }}
+        />
       </div>
     ))}
   </div>
