@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Lock, Upload, Trophy, Calendar, Star, Trash2, Image, X,
   BarChart3, Users, MapPin, Smartphone, Monitor, Tablet,
-  Newspaper, Pin, TrendingUp, Eye, Globe, Shield, Tv,
+  TrendingUp, Eye, Globe, Shield,
 } from "lucide-react";
 import { CricketBall, CricketBat, CricketStumps } from "@/components/CricketDecorations";
 import {
@@ -81,8 +81,7 @@ const AdminPanel = () => {
 
       <div className="container py-6 space-y-6 max-w-5xl">
         <AnalyticsDashboard password={password} toast={toast} />
-        <ScoreboardManager password={password} toast={toast} />
-        <NewsManager password={password} toast={toast} />
+        <GalleryManager password={password} toast={toast} />
         <GalleryManager password={password} toast={toast} />
         <PointsTableManager password={password} toast={toast} />
         <MatchesManager password={password} toast={toast} />
@@ -292,195 +291,8 @@ const AnalyticsDashboard = ({ password, toast }: { password: string; toast: any 
   );
 };
 
-// ── Scoreboard Manager ──
-const ScoreboardManager = ({ password, toast }: { password: string; toast: any }) => {
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
 
-  const loadItems = async () => {
-    const { data } = await supabase.from("scoreboard_updates").select("*").order("created_at", { ascending: false });
-    if (data) setItems(data);
-  };
 
-  useEffect(() => { loadItems(); }, []);
-
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    setLoading(true);
-    try {
-      await adminApi("add-scoreboard", password, { message });
-      toast({ title: "Scoreboard update added!" });
-      setMessage("");
-      loadItems();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await adminApi("delete-scoreboard", password, { id });
-      toast({ title: "Update removed!" });
-      loadItems();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    }
-  };
-
-  return (
-    <AdminSection icon={Tv} title="Scoreboard Updates" subtitle="Cricket scoreboard-style league news (shown one by one)" accentColor="text-cricket-gold">
-      <form onSubmit={handleAdd} className="space-y-3">
-        <div>
-          <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Update Message</Label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="E.g. Darbhanga Kings won by 5 wickets against Thunder!"
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[70px]"
-          />
-        </div>
-        <Button type="submit" disabled={loading || !message.trim()} className="w-full bg-gradient-accent shadow-glow font-heading uppercase tracking-wider text-sm">
-          {loading ? "Adding..." : "Add to Scoreboard"}
-        </Button>
-      </form>
-
-      {items.length > 0 && (
-        <div className="space-y-2 mt-4">
-          <h3 className="font-heading text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            <Tv size={12} /> Live Updates ({items.length})
-          </h3>
-          {items.map((item) => (
-            <div key={item.id} className="flex items-start justify-between gap-3 bg-secondary/50 rounded-xl px-4 py-3 border border-border/50">
-              <div className="flex-1 min-w-0">
-                <p className="font-heading text-sm font-bold">{item.message}</p>
-                <span className="text-[10px] text-muted-foreground font-display">{new Date(item.created_at).toLocaleDateString()}</span>
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => handleDelete(item.id)} className="shrink-0">
-                <Trash2 size={14} />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-    </AdminSection>
-  );
-};
-
-// ── News Manager ──
-const NewsManager = ({ password, toast }: { password: string; toast: any }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [category, setCategory] = useState("general");
-  const [isPinned, setIsPinned] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [newsList, setNewsList] = useState<any[]>([]);
-
-  const loadNews = async () => {
-    const { data } = await supabase.from("news").select("*").order("created_at", { ascending: false });
-    if (data) setNewsList(data);
-  };
-
-  useEffect(() => { loadNews(); }, []);
-
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !content) return;
-    setLoading(true);
-    try {
-      await adminApi("add-news", password, { title, content, category, is_pinned: isPinned });
-      toast({ title: "News added!" });
-      setTitle(""); setContent(""); setCategory("general"); setIsPinned(false);
-      loadNews();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await adminApi("delete-news", password, { id });
-      toast({ title: "News removed!" });
-      loadNews();
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    }
-  };
-
-  return (
-    <AdminSection icon={Newspaper} title="News & Notifications" subtitle="Manage scoreboard news ticker & announcements" accentColor="text-cricket-orange">
-      <form onSubmit={handleAdd} className="space-y-3">
-        <div>
-          <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Headline</Label>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="News headline" className="mt-1" />
-        </div>
-        <div>
-          <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Content</Label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="News details..."
-            className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[80px]"
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Category</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="match">Match Update</SelectItem>
-                <SelectItem value="announcement">Announcement</SelectItem>
-                <SelectItem value="result">Result</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-end">
-            <label className="flex items-center gap-2 pb-2 cursor-pointer">
-              <input type="checkbox" checked={isPinned} onChange={(e) => setIsPinned(e.target.checked)} className="rounded" />
-              <Pin size={14} className="text-primary" />
-              <span className="text-sm font-display">Pin this news</span>
-            </label>
-          </div>
-        </div>
-        <Button type="submit" disabled={loading || !title || !content} className="w-full bg-gradient-accent shadow-glow font-heading uppercase tracking-wider text-sm">
-          {loading ? "Publishing..." : "Publish News"}
-        </Button>
-      </form>
-
-      {newsList.length > 0 && (
-        <div className="space-y-2 mt-4">
-          <h3 className="font-heading text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            <Newspaper size={12} /> Published News
-          </h3>
-          {newsList.map((n) => (
-            <div key={n.id} className="flex items-start justify-between gap-3 bg-secondary/50 rounded-xl px-4 py-3 border border-border/50">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  {n.is_pinned && <Pin size={10} className="text-primary shrink-0" />}
-                  <span className="font-heading text-sm font-bold truncate">{n.title}</span>
-                </div>
-                <p className="text-xs text-muted-foreground truncate">{n.content}</p>
-                <span className="text-[10px] text-muted-foreground font-display">{n.category} • {new Date(n.created_at).toLocaleDateString()}</span>
-              </div>
-              <Button variant="destructive" size="sm" onClick={() => handleDelete(n.id)} className="shrink-0">
-                <Trash2 size={14} />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-    </AdminSection>
-  );
-};
-
-// ── Gallery Manager ──
 const GalleryManager = ({ password, toast }: { password: string; toast: any }) => {
   const [files, setFiles] = useState<FileList | null>(null);
   const [showOnHomepage, setShowOnHomepage] = useState(false);
