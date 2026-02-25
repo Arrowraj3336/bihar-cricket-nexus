@@ -13,11 +13,45 @@ serve(async (req) => {
   }
 
   try {
-    const { name, dob, phone, email, documentType, documentNumber, playerType, address } = await req.json();
+    const body = await req.json();
+    const { name, dob, phone, email, documentType, documentNumber, playerType, address } = body;
 
-    if (!name || !dob || !phone || !email || !documentType || !documentNumber || !playerType || !address) {
-      throw new Error("All fields are required");
+    // --- Server-side validation ---
+    const errors: string[] = [];
+
+    if (!name || typeof name !== "string" || name.trim().length === 0) errors.push("Name is required");
+    else if (name.trim().length > 100) errors.push("Name must be under 100 characters");
+
+    if (!dob || typeof dob !== "string") errors.push("Date of birth is required");
+    else if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) errors.push("Invalid date format (YYYY-MM-DD)");
+
+    if (!phone || typeof phone !== "string") errors.push("Phone is required");
+    else if (!/^[\d+\-\s]{7,15}$/.test(phone.trim())) errors.push("Invalid phone number");
+
+    if (!email || typeof email !== "string") errors.push("Email is required");
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.trim().length > 255) errors.push("Invalid email");
+
+    const allowedDocTypes = ["Aadhar Card", "Birth Certificate"];
+    if (!documentType || !allowedDocTypes.includes(documentType)) errors.push("Invalid document type");
+
+    if (!documentNumber || typeof documentNumber !== "string" || documentNumber.trim().length === 0) errors.push("Document number is required");
+    else if (documentNumber.trim().length > 50) errors.push("Document number too long");
+
+    const allowedPlayerTypes = ["Batter", "Bowler", "All Rounder", "Wicket Keeper"];
+    if (!playerType || !allowedPlayerTypes.includes(playerType)) errors.push("Invalid player type");
+
+    if (!address || typeof address !== "string" || address.trim().length === 0) errors.push("Address is required");
+    else if (address.trim().length > 500) errors.push("Address must be under 500 characters");
+
+    if (errors.length > 0) {
+      return new Response(
+        JSON.stringify({ error: errors.join("; ") }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
+
+    // Sanitize inputs
+    const sanitize = (s: string) => s.trim().replace(/[<>]/g, "");
 
     // Store in database
     const supabaseAdmin = createClient(
@@ -26,23 +60,19 @@ serve(async (req) => {
     );
 
     const { error: dbError } = await supabaseAdmin.from("registrations").insert({
-      name,
+      name: sanitize(name),
       dob,
-      phone,
-      email,
+      phone: sanitize(phone),
+      email: sanitize(email),
       document_type: documentType,
-      document_number: documentNumber,
+      document_number: sanitize(documentNumber),
       player_type: playerType,
-      address,
+      address: sanitize(address),
     });
 
     if (dbError) throw dbError;
 
-    // Send email notification via Lovable AI Gateway (as a workaround to notify)
-    // For now, we'll use a simple fetch to send email via a free service
-    // Actually, let's just store in DB and the admin can check the Cloud dashboard
-    
-    console.log(`New registration from ${name} (${email}) - ${playerType}`);
+    console.log(`New registration from ${sanitize(name)} - ${playerType}`);
 
     return new Response(
       JSON.stringify({ success: true, message: "Registration submitted successfully" }),
