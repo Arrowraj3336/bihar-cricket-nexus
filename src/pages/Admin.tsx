@@ -121,6 +121,9 @@ const AdminPanel = () => {
               }}
               placeholder="Enter admin password"
               autoComplete="current-password"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               required
               className="mt-1"
             />
