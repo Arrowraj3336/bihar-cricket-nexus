@@ -82,7 +82,6 @@ const AdminPanel = () => {
       <div className="container py-6 space-y-6 max-w-5xl">
         <AnalyticsDashboard password={password} toast={toast} />
         <GalleryManager password={password} toast={toast} />
-        <GalleryManager password={password} toast={toast} />
         <PointsTableManager password={password} toast={toast} />
         <MatchesManager password={password} toast={toast} />
         <PerformersManager password={password} toast={toast} />
