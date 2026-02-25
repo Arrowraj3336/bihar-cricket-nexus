@@ -79,7 +79,7 @@ const AdminPanel = () => {
       bootTimeoutRef.current = window.setTimeout(() => {
         setAuthenticated(true);
         setShowBootSequence(false);
-      }, 1800);
+      }, 800);
     } catch {
       setAuthenticated(false);
       setShowBootSequence(false);
