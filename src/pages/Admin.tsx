@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Upload, Trophy, Calendar, Star, Trash2, Image, X,
   BarChart3, Users, MapPin, Smartphone,
-  TrendingUp, Eye, Globe, Shield, ScanLine,
+  TrendingUp, Eye, Globe, Shield, ScanLine, Bell,
 } from "lucide-react";
 import { CricketBall, CricketBat, CricketStumps } from "@/components/CricketDecorations";
 import {
@@ -556,6 +556,7 @@ const AdminPanel = () => {
         <PointsTableManager password={pin} toast={toast} />
         <MatchesManager password={pin} toast={toast} />
         <PerformersManager password={pin} toast={toast} />
+        <AlertsManager password={pin} toast={toast} />
       </div>
     </div>
   );
@@ -1148,6 +1149,115 @@ const PerformersManager = ({ password, toast }: { password: string; toast: any }
           {loading ? "Updating..." : "Update Performer"}
         </Button>
       </form>
+    </AdminSection>
+  );
+};
+
+// ── Alerts Manager ──
+const AlertsManager = ({ password, toast }: { password: string; toast: any }) => {
+  const [message, setMessage] = useState("");
+  const [alertType, setAlertType] = useState("info");
+  const [loading, setLoading] = useState(false);
+  const [alerts, setAlerts] = useState<any[]>([]);
+
+  const loadAlerts = async () => {
+    const { data } = await supabase.from("alerts").select("*").order("created_at", { ascending: false });
+    if (data) setAlerts(data);
+  };
+
+  useEffect(() => { loadAlerts(); }, []);
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    setLoading(true);
+    try {
+      await adminApi("add-alert", password, { message: message.trim(), alert_type: alertType });
+      toast({ title: "Alert added!" });
+      setMessage("");
+      loadAlerts();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await adminApi("delete-alert", password, { id });
+      toast({ title: "Alert removed!" });
+      loadAlerts();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const typeLabels: Record<string, string> = {
+    info: "ℹ️ Info",
+    warning: "⚠️ Warning",
+    success: "✅ Success",
+    urgent: "🔴 Urgent",
+  };
+
+  return (
+    <AdminSection icon={Bell} title="Alerts & Notifications" subtitle="Manage public alerts shown on the website" accentColor="text-accent">
+      <form onSubmit={handleAdd} className="space-y-3">
+        <div>
+          <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Alert Type</Label>
+          <Select value={alertType} onValueChange={setAlertType}>
+            <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="info">ℹ️ Info</SelectItem>
+              <SelectItem value="warning">⚠️ Warning</SelectItem>
+              <SelectItem value="success">✅ Success</SelectItem>
+              <SelectItem value="urgent">🔴 Urgent</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Message</Label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Enter alert message..."
+            rows={3}
+            className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+        </div>
+        <Button type="submit" disabled={loading || !message.trim()} className="w-full bg-gradient-accent shadow-glow font-heading uppercase tracking-wider text-sm">
+          {loading ? "Adding..." : "Add Alert"}
+        </Button>
+      </form>
+
+      {alerts.length > 0 && (
+        <div className="space-y-2 mt-4">
+          <h3 className="font-heading text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <Bell size={12} /> Active Alerts ({alerts.length})
+          </h3>
+          {alerts.map((a) => (
+            <div key={a.id} className="flex items-start justify-between gap-3 bg-secondary/50 rounded-xl px-4 py-3 border border-border/50">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-display font-semibold uppercase tracking-wider text-muted-foreground">
+                    {typeLabels[a.alert_type] || a.alert_type}
+                  </span>
+                  {!a.is_active && (
+                    <span className="text-[9px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-display">Inactive</span>
+                  )}
+                </div>
+                <p className="text-sm font-display leading-relaxed">{a.message}</p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {new Date(a.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                </p>
+              </div>
+              <Button variant="destructive" size="sm" onClick={() => handleDelete(a.id)}>
+                <Trash2 size={12} />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
     </AdminSection>
   );
 };

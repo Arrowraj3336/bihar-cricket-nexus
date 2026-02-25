@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_active: boolean
+          message: string
+        }
+        Insert: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message?: string
+        }
+        Relationships: []
+      }
       gallery_images: {
         Row: {
           alt_text: string
