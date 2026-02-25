@@ -46,8 +46,90 @@ const JarvisBootScreen = () => (
   </div>
 );
 
+const PIN_LENGTH = 4;
+
+const PinKeypad = ({ onComplete, error, isLoading }: { onComplete: (pin: string) => void; error: string; isLoading: boolean }) => {
+  const [pin, setPin] = useState<string>("");
+
+  const handleDigit = (digit: string) => {
+    if (pin.length >= PIN_LENGTH || isLoading) return;
+    const newPin = pin + digit;
+    setPin(newPin);
+    if (newPin.length === PIN_LENGTH) {
+      onComplete(newPin);
+    }
+  };
+
+  const handleDelete = () => {
+    setPin((prev) => prev.slice(0, -1));
+  };
+
+  // Reset pin when error changes (wrong pin entered)
+  useEffect(() => {
+    if (error) setPin("");
+  }, [error]);
+
+  return (
+    <div className="flex flex-col items-center gap-5">
+      {/* PIN Dots */}
+      <div className="flex gap-4">
+        {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+          <div
+            key={i}
+            className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+              i < pin.length
+                ? "bg-primary border-primary scale-110"
+                : "border-muted-foreground/40 bg-transparent"
+            } ${error && pin.length === 0 ? "border-destructive animate-shake" : ""}`}
+          />
+        ))}
+      </div>
+
+      {error && (
+        <p className="text-xs text-destructive font-display animate-pulse" role="alert">{error}</p>
+      )}
+
+      {/* Numeric Keypad */}
+      <div className="grid grid-cols-3 gap-3 w-full max-w-[260px]">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
+          <button
+            key={digit}
+            type="button"
+            disabled={isLoading}
+            onClick={() => handleDigit(digit)}
+            className="h-14 w-full rounded-xl bg-secondary/80 border border-border/50 text-xl font-heading font-bold text-foreground hover:bg-secondary active:scale-95 transition-all duration-100 disabled:opacity-50"
+          >
+            {digit}
+          </button>
+        ))}
+        <div /> {/* empty cell */}
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={() => handleDigit("0")}
+          className="h-14 w-full rounded-xl bg-secondary/80 border border-border/50 text-xl font-heading font-bold text-foreground hover:bg-secondary active:scale-95 transition-all duration-100 disabled:opacity-50"
+        >
+          0
+        </button>
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={handleDelete}
+          className="h-14 w-full rounded-xl bg-secondary/80 border border-border/50 text-sm font-display font-semibold text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-95 transition-all duration-100 disabled:opacity-50"
+        >
+          ⌫
+        </button>
+      </div>
+
+      {isLoading && (
+        <p className="text-xs text-muted-foreground font-display animate-pulse">Verifying...</p>
+      )}
+    </div>
+  );
+};
+
 const AdminPanel = () => {
-  const [password, setPassword] = useState("");
+  const [pin, setPin] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [loginError, setLoginError] = useState("");
@@ -63,17 +145,14 @@ const AdminPanel = () => {
     };
   }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const normalizedPassword = password.trim();
-    if (!normalizedPassword || isAuthenticating) return;
-
+  const handlePinComplete = async (enteredPin: string) => {
+    if (isAuthenticating) return;
     setIsAuthenticating(true);
     setLoginError("");
 
     try {
-      await adminApi("verify-auth", normalizedPassword);
-      setPassword(normalizedPassword);
+      await adminApi("verify-auth", enteredPin);
+      setPin(enteredPin);
       setShowBootSequence(true);
 
       bootTimeoutRef.current = window.setTimeout(() => {
@@ -83,7 +162,7 @@ const AdminPanel = () => {
     } catch {
       setAuthenticated(false);
       setShowBootSequence(false);
-      setLoginError("Wrong password. Please try again.");
+      setLoginError("Wrong PIN. Try again.");
     } finally {
       setIsAuthenticating(false);
     }
@@ -100,45 +179,18 @@ const AdminPanel = () => {
         <CricketBat className="absolute bottom-20 left-10 w-10 h-32 text-accent opacity-[0.06] -rotate-12" />
         <CricketStumps className="absolute top-1/3 left-20 w-12 h-20 text-primary opacity-[0.04]" />
 
-        <form onSubmit={handleLogin} className="relative bg-gradient-card border border-border rounded-2xl p-8 w-full max-w-sm space-y-5 shadow-card">
+        <div className="relative bg-gradient-card border border-border rounded-2xl p-8 w-full max-w-sm space-y-5 shadow-card">
           <div className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary rounded-t-2xl absolute top-0 left-0 right-0" />
           <div className="flex flex-col items-center gap-2 pt-2">
             <div className="w-14 h-14 rounded-xl bg-gradient-accent flex items-center justify-center shadow-glow">
               <Shield size={24} className="text-primary-foreground" />
             </div>
             <h1 className="font-heading text-2xl font-bold">BRL Admin</h1>
-            <p className="text-xs text-muted-foreground font-display">Bihar Rural League Management</p>
-          </div>
-          <div>
-            <Label htmlFor="password" className="text-xs font-display font-semibold uppercase tracking-wider text-muted-foreground">Admin Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (loginError) setLoginError("");
-              }}
-              placeholder="Enter admin password"
-              autoComplete="current-password"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              required
-              className="mt-1"
-            />
+            <p className="text-xs text-muted-foreground font-display">Enter 4-digit PIN to continue</p>
           </div>
 
-          {loginError && (
-            <p className="text-xs text-destructive font-display" role="alert" aria-live="polite">
-              {loginError}
-            </p>
-          )}
-
-          <Button type="submit" disabled={isAuthenticating} className="w-full bg-gradient-accent shadow-glow font-heading uppercase tracking-wider">
-            {isAuthenticating ? "Checking Password..." : "Enter Dashboard"}
-          </Button>
-        </form>
+          <PinKeypad onComplete={handlePinComplete} error={loginError} isLoading={isAuthenticating} />
+        </div>
       </div>
     );
   }
@@ -171,7 +223,7 @@ const AdminPanel = () => {
               setAuthenticated(false);
               setShowBootSequence(false);
               setLoginError("");
-              setPassword("");
+              setPin("");
             }}
             className="font-display text-xs"
           >
@@ -181,11 +233,11 @@ const AdminPanel = () => {
       </div>
 
       <div className="container py-6 space-y-6 max-w-5xl">
-        <AnalyticsDashboard password={password} toast={toast} />
-        <GalleryManager password={password} toast={toast} />
-        <PointsTableManager password={password} toast={toast} />
-        <MatchesManager password={password} toast={toast} />
-        <PerformersManager password={password} toast={toast} />
+        <AnalyticsDashboard password={pin} toast={toast} />
+        <GalleryManager password={pin} toast={toast} />
+        <PointsTableManager password={pin} toast={toast} />
+        <MatchesManager password={pin} toast={toast} />
+        <PerformersManager password={pin} toast={toast} />
       </div>
     </div>
   );
