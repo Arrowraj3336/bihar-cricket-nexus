@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import TeamsSection from "@/components/TeamsSection";
 import UpcomingMatches from "@/components/UpcomingMatches";
 import TopPerformers from "@/components/TopPerformers";
+import AlertsSection from "@/components/AlertsSection";
 import GallerySection from "@/components/GallerySection";
 import OrganiserSection from "@/components/OrganiserSection";
 import Footer from "@/components/Footer";
@@ -20,6 +21,7 @@ const Index = () => {
       <TeamsSection />
       <UpcomingMatches />
       <TopPerformers />
+      <AlertsSection />
       <GallerySection />
       <OrganiserSection />
       <Footer />

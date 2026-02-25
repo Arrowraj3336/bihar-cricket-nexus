@@ -207,6 +207,30 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Alerts: add
+    if (action === "add-alert" && req.method === "POST") {
+      const body = await req.json();
+      const { error } = await supabase.from("alerts").insert({
+        message: body.message,
+        alert_type: body.alert_type || "info",
+        is_active: true,
+      });
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Alerts: delete
+    if (action === "delete-alert" && req.method === "POST") {
+      const { id } = await req.json();
+      const { error } = await supabase.from("alerts").delete().eq("id", id);
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Unknown action" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
