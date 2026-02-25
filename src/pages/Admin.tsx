@@ -48,6 +48,11 @@ const JarvisBootScreen = () => (
 
 const PIN_LENGTH = 4;
 
+const PHONE_LETTERS: Record<string, string> = {
+  "2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL",
+  "6": "MNO", "7": "PQRS", "8": "TUV", "9": "WXYZ",
+};
+
 const PinKeypad = ({ onComplete, error, isLoading }: { onComplete: (pin: string) => void; error: string; isLoading: boolean }) => {
   const [pin, setPin] = useState<string>("");
 
@@ -64,42 +69,44 @@ const PinKeypad = ({ onComplete, error, isLoading }: { onComplete: (pin: string)
     setPin((prev) => prev.slice(0, -1));
   };
 
-  // Reset pin when error changes (wrong pin entered)
   useEffect(() => {
     if (error) setPin("");
   }, [error]);
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-8">
       {/* PIN Dots */}
-      <div className="flex gap-4">
+      <div className="flex gap-5">
         {Array.from({ length: PIN_LENGTH }).map((_, i) => (
           <div
             key={i}
-            className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+            className={`w-3.5 h-3.5 rounded-full transition-all duration-300 ${
               i < pin.length
-                ? "bg-primary border-primary scale-110"
-                : "border-muted-foreground/40 bg-transparent"
+                ? "bg-background scale-125"
+                : "border-2 border-background/30"
             } ${error && pin.length === 0 ? "border-destructive animate-shake" : ""}`}
           />
         ))}
       </div>
 
       {error && (
-        <p className="text-xs text-destructive font-display animate-pulse" role="alert">{error}</p>
+        <p className="text-xs text-destructive font-display animate-pulse -mt-4" role="alert">{error}</p>
       )}
 
-      {/* Numeric Keypad */}
-      <div className="grid grid-cols-3 gap-3 w-full max-w-[260px]">
+      {/* Mobile-style Numeric Keypad */}
+      <div className="grid grid-cols-3 gap-x-6 gap-y-4">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
           <button
             key={digit}
             type="button"
             disabled={isLoading}
             onClick={() => handleDigit(digit)}
-            className="h-14 w-full rounded-xl bg-secondary/80 border border-border/50 text-xl font-heading font-bold text-foreground hover:bg-secondary active:scale-95 transition-all duration-100 disabled:opacity-50"
+            className="w-[76px] h-[76px] rounded-full bg-background/[0.08] backdrop-blur-sm flex flex-col items-center justify-center hover:bg-background/[0.16] active:bg-background/25 active:scale-[0.93] transition-all duration-150 disabled:opacity-40 select-none"
           >
-            {digit}
+            <span className="text-[28px] font-light text-background leading-none">{digit}</span>
+            {PHONE_LETTERS[digit] && (
+              <span className="text-[9px] font-semibold tracking-[0.18em] text-background/50 mt-0.5 uppercase">{PHONE_LETTERS[digit]}</span>
+            )}
           </button>
         ))}
         <div /> {/* empty cell */}
@@ -107,22 +114,22 @@ const PinKeypad = ({ onComplete, error, isLoading }: { onComplete: (pin: string)
           type="button"
           disabled={isLoading}
           onClick={() => handleDigit("0")}
-          className="h-14 w-full rounded-xl bg-secondary/80 border border-border/50 text-xl font-heading font-bold text-foreground hover:bg-secondary active:scale-95 transition-all duration-100 disabled:opacity-50"
+          className="w-[76px] h-[76px] rounded-full bg-background/[0.08] backdrop-blur-sm flex flex-col items-center justify-center hover:bg-background/[0.16] active:bg-background/25 active:scale-[0.93] transition-all duration-150 disabled:opacity-40 select-none"
         >
-          0
+          <span className="text-[28px] font-light text-background leading-none">0</span>
         </button>
         <button
           type="button"
-          disabled={isLoading}
+          disabled={isLoading || pin.length === 0}
           onClick={handleDelete}
-          className="h-14 w-full rounded-xl bg-secondary/80 border border-border/50 text-sm font-display font-semibold text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-95 transition-all duration-100 disabled:opacity-50"
+          className="w-[76px] h-[76px] rounded-full flex items-center justify-center hover:bg-background/[0.08] active:scale-[0.93] transition-all duration-150 disabled:opacity-30 select-none"
         >
-          ⌫
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-background"><path d="M9 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/><path d="M3 12l5-7h12a1 1 0 011 1v12a1 1 0 01-1 1H8l-5-7z"/></svg>
         </button>
       </div>
 
       {isLoading && (
-        <p className="text-xs text-muted-foreground font-display animate-pulse">Verifying...</p>
+        <p className="text-xs text-background/40 font-display animate-pulse">Verifying...</p>
       )}
     </div>
   );
@@ -174,23 +181,26 @@ const AdminPanel = () => {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-        <CricketBall className="absolute top-20 right-20 w-40 h-40 text-primary opacity-[0.04]" />
-        <CricketBat className="absolute bottom-20 left-10 w-10 h-32 text-accent opacity-[0.06] -rotate-12" />
-        <CricketStumps className="absolute top-1/3 left-20 w-12 h-20 text-primary opacity-[0.04]" />
+      <div className="min-h-screen bg-foreground flex flex-col items-center justify-between py-12 px-4 relative overflow-hidden select-none">
+        {/* Subtle radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.15),transparent_60%)]" />
 
-        <div className="relative bg-gradient-card border border-border rounded-2xl p-8 w-full max-w-sm space-y-5 shadow-card">
-          <div className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary rounded-t-2xl absolute top-0 left-0 right-0" />
-          <div className="flex flex-col items-center gap-2 pt-2">
-            <div className="w-14 h-14 rounded-xl bg-gradient-accent flex items-center justify-center shadow-glow">
-              <Shield size={24} className="text-primary-foreground" />
-            </div>
-            <h1 className="font-heading text-2xl font-bold">BRL Admin</h1>
-            <p className="text-xs text-muted-foreground font-display">Enter 4-digit PIN to continue</p>
+        {/* Top section: time-like header */}
+        <div className="relative z-10 flex flex-col items-center gap-1 mt-4">
+          <div className="w-16 h-16 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-3">
+            <Shield size={28} className="text-primary-foreground/90" />
           </div>
+          <h1 className="font-heading text-2xl font-bold text-background tracking-wide">BRL Admin</h1>
+          <p className="text-xs text-background/50 font-display tracking-wider">Enter Passcode</p>
+        </div>
 
+        {/* Center: PIN + Keypad */}
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center -mt-4">
           <PinKeypad onComplete={handlePinComplete} error={loginError} isLoading={isAuthenticating} />
         </div>
+
+        {/* Bottom hint */}
+        <p className="relative z-10 text-[10px] text-background/25 font-display tracking-widest uppercase">Secured Access</p>
       </div>
     );
   }
