@@ -460,6 +460,18 @@ const AdminPanel = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    if (!SUPABASE_URL) return;
+
+    void fetch(`${SUPABASE_URL}/functions/v1/admin-api?action=verify-auth`, {
+      method: "POST",
+      headers: {
+        "x-admin-password": "0",
+      },
+    }).catch(() => undefined);
+  }, []);
+
   const handlePinComplete = async (enteredPin: string) => {
     if (isAuthenticating) return;
     setIsAuthenticating(true);
@@ -467,7 +479,7 @@ const AdminPanel = () => {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = window.setTimeout(() => controller.abort(), 8000);
 
       const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
       const res = await fetch(
@@ -481,35 +493,29 @@ const AdminPanel = () => {
           signal: controller.signal,
         }
       );
-      clearTimeout(timeoutId);
+      window.clearTimeout(timeoutId);
 
       if (res.status === 401) {
         setLoginError("Wrong PIN. Try again.");
-        setIsAuthenticating(false);
         return;
       }
 
       if (!res.ok) {
         setLoginError("Server error. Please retry.");
-        setIsAuthenticating(false);
         return;
       }
 
       setPin(enteredPin);
-      setShowBootSequence(true);
-      setIsAuthenticating(false);
-
-      bootTimeoutRef.current = window.setTimeout(() => {
-        setAuthenticated(true);
-        setShowBootSequence(false);
-      }, 4500);
+      setShowBootSequence(false);
+      setAuthenticated(true);
     } catch (err: any) {
-      setIsAuthenticating(false);
       if (err?.name === "AbortError") {
         setLoginError("Timed out. Check your connection.");
       } else {
         setLoginError("Network error. Please retry.");
       }
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
