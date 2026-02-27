@@ -466,20 +466,50 @@ const AdminPanel = () => {
     setLoginError("");
 
     try {
-      const result = await adminApi("verify-auth", enteredPin);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(
+        `${SUPABASE_URL}/functions/v1/admin-api?action=verify-auth`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": enteredPin,
+          },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+
+      if (res.status === 401) {
+        setLoginError("Wrong PIN. Try again.");
+        setIsAuthenticating(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setLoginError("Server error. Please retry.");
+        setIsAuthenticating(false);
+        return;
+      }
+
       setPin(enteredPin);
       setShowBootSequence(true);
+      setIsAuthenticating(false);
 
       bootTimeoutRef.current = window.setTimeout(() => {
         setAuthenticated(true);
         setShowBootSequence(false);
       }, 4500);
-    } catch {
-      setAuthenticated(false);
-      setShowBootSequence(false);
-      setLoginError("Wrong PIN. Try again.");
-    } finally {
+    } catch (err: any) {
       setIsAuthenticating(false);
+      if (err?.name === "AbortError") {
+        setLoginError("Timed out. Check your connection.");
+      } else {
+        setLoginError("Network error. Please retry.");
+      }
     }
   };
 
