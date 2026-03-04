@@ -3,6 +3,7 @@ import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { CricketBall, CricketStumps } from "./CricketDecorations";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import TransparentLogoImage from "./TransparentLogoImage";
 
 import logoLions from "@/assets/logos/darbhanga-lions.png";
 import logoWarriors from "@/assets/logos/darbhanga-warriors.png";
