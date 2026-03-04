@@ -3,6 +3,7 @@ import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { CricketBall, CricketStumps } from "./CricketDecorations";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import TransparentLogoImage from "./TransparentLogoImage";
 
 import logoLions from "@/assets/logos/darbhanga-lions.png";
 import logoWarriors from "@/assets/logos/darbhanga-warriors.png";
@@ -85,7 +86,7 @@ const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velo
 const TeamBadge = ({ team, size = "card" }: { team: TeamData; size?: "card" | "table" }) => {
   if (team.logo) {
     const sizeClass = size === "card" ? "w-20 h-20 md:w-24 md:h-24" : "w-8 h-8";
-    return <img src={team.logo} alt={team.name} loading="lazy" className={`${sizeClass} object-contain rounded-lg mix-blend-screen`} />;
+    return <TransparentLogoImage src={team.logo} alt={team.name} className={`${sizeClass} object-contain`} />;
   }
   if (size === "table") {
     return (
