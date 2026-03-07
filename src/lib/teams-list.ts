@@ -11,6 +11,4 @@ export const TEAM_NAMES = [
   "Darbhanga Hurricanes",
   "Darbhanga Blasters",
   "Darbhanga Super XI",
-  "Darbhanga Thunder",
-  "Darbhanga Gladiators",
 ] as const;

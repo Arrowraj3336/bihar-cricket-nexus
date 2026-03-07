@@ -4,42 +4,8 @@ import { CricketBall, CricketStumps } from "./CricketDecorations";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import TransparentLogoImage from "./TransparentLogoImage";
-
-import logoLions from "@/assets/logos/darbhanga-lions.png";
-import logoWarriors from "@/assets/logos/darbhanga-warriors.png";
-import logoRoyals from "@/assets/logos/darbhanga-royals.png";
-import logoTigers from "@/assets/logos/darbhanga-tigers.png";
-import logoPanthers from "@/assets/logos/darbhanga-panthers.png";
-import logoStrikers from "@/assets/logos/darbhanga-strikers.png";
-import logoKings from "@/assets/logos/darbhanga-kings.png";
-import logoChallengers from "@/assets/logos/darbhanga-challengers.png";
-import logoFalcons from "@/assets/logos/darbhanga-falcons.png";
-import logoHurricanes from "@/assets/logos/darbhanga-hurricanes.png";
-import logoBlasters from "@/assets/logos/darbhanga-blasters.png";
-import logoSuperXI from "@/assets/logos/darbhanga-super-xi.png";
-import logoThunder from "@/assets/logos/darbhanga-thunder.png";
-import logoGladiators from "@/assets/logos/darbhanga-gladiators.png";
-import logoSuperGiants from "@/assets/logos/darbhanga-super-giants.png";
-import logoMavericks from "@/assets/logos/darbhanga-mavericks.png";
-
-const logoMap: Record<string, string> = {
-  "Darbhanga Lions": logoLions,
-  "Darbhanga Warriors": logoWarriors,
-  "Darbhanga Royals": logoRoyals,
-  "Darbhanga Tigers": logoTigers,
-  "Darbhanga Panthers": logoPanthers,
-  "Darbhanga Strikers": logoStrikers,
-  "Darbhanga Kings": logoKings,
-  "Darbhanga Challengers": logoChallengers,
-  "Darbhanga Falcons": logoFalcons,
-  "Darbhanga Hurricanes": logoHurricanes,
-  "Darbhanga Blasters": logoBlasters,
-  "Darbhanga Super XI": logoSuperXI,
-  "Darbhanga Thunder": logoThunder,
-  "Darbhanga Gladiators": logoGladiators,
-  "Darbhanga Super Giants": logoSuperGiants,
-  "Darbhanga Mavericks": logoMavericks,
-};
+import { teamLogoMap } from "@/lib/team-logos";
+import { TEAM_NAMES } from "@/lib/teams-list";
 
 const colorMap: Record<string, string> = {
   "Darbhanga Lions": "hsl(265 60% 50%)",
@@ -54,10 +20,6 @@ const colorMap: Record<string, string> = {
   "Darbhanga Hurricanes": "hsl(15 80% 50%)",
   "Darbhanga Blasters": "hsl(50 90% 45%)",
   "Darbhanga Super XI": "hsl(120 50% 45%)",
-  "Darbhanga Thunder": "hsl(210 70% 55%)",
-  "Darbhanga Gladiators": "hsl(300 50% 45%)",
-  "Darbhanga Super Giants": "hsl(30 70% 50%)",
-  "Darbhanga Mavericks": "hsl(350 60% 50%)",
 };
 
 const abbrMap: Record<string, string> = {
@@ -65,16 +27,9 @@ const abbrMap: Record<string, string> = {
   "Darbhanga Tigers": "DT", "Darbhanga Panthers": "DP", "Darbhanga Strikers": "DS",
   "Darbhanga Kings": "DK", "Darbhanga Challengers": "DC", "Darbhanga Falcons": "DF",
   "Darbhanga Hurricanes": "DH", "Darbhanga Blasters": "DB", "Darbhanga Super XI": "DX",
-  "Darbhanga Thunder": "DTH", "Darbhanga Gladiators": "DG", "Darbhanga Super Giants": "DSG",
-  "Darbhanga Mavericks": "DM",
 };
 
-const defaultTeams = [
-  "Darbhanga Lions", "Darbhanga Warriors", "Darbhanga Royals", "Darbhanga Tigers",
-  "Darbhanga Panthers", "Darbhanga Strikers", "Darbhanga Kings", "Darbhanga Challengers",
-  "Darbhanga Falcons", "Darbhanga Hurricanes", "Darbhanga Blasters", "Darbhanga Super XI",
-  "Darbhanga Thunder", "Darbhanga Gladiators", "Darbhanga Super Giants", "Darbhanga Mavericks",
-];
+const defaultTeams = [...TEAM_NAMES];
 
 type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number };
 
@@ -106,7 +61,7 @@ const TeamsSection = () => {
   const [teams, setTeams] = useState<TeamData[]>(
     defaultTeams.map(name => ({
       name, abbr: abbrMap[name] || "??", color: colorMap[name] || "hsl(0 0% 50%)",
-      logo: logoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
+      logo: teamLogoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
     }))
   );
 
@@ -129,7 +84,7 @@ const TeamsSection = () => {
             name,
             abbr: abbrMap[name] || "??",
             color: colorMap[name] || "hsl(0 0% 50%)",
-            logo: logoMap[name] || "",
+            logo: teamLogoMap[name] || "",
             played: db?.played || 0,
             won: db?.won || 0,
             lost: db?.lost || 0,
@@ -146,11 +101,8 @@ const TeamsSection = () => {
         name,
         abbr: abbrMap[name] || "??",
         color: colorMap[name] || "hsl(0 0% 50%)",
-        logo: logoMap[name] || "",
-        played: 0,
-        won: 0,
-        lost: 0,
-        pts: 0,
+        logo: teamLogoMap[name] || "",
+        played: 0, won: 0, lost: 0, pts: 0,
       })));
     };
 
@@ -158,13 +110,7 @@ const TeamsSection = () => {
 
     const channel = supabase
       .channel("points-table-live")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "points_table" },
-        () => {
-          load();
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "points_table" }, () => load())
       .subscribe();
 
     const refreshInterval = window.setInterval(load, 15000);
@@ -197,8 +143,6 @@ const TeamsSection = () => {
     exit: (dir: number) => ({ x: dir < 0 ? 300 : -300, opacity: 0 }),
   };
 
-  
-
   return (
     <section id="teams" className="py-16 md:py-24 bg-background cricket-ball-pattern relative overflow-hidden">
       <CricketStumps className="absolute -right-4 top-20 w-16 h-24 text-primary" />
@@ -213,7 +157,7 @@ const TeamsSection = () => {
           <h2 className="font-heading text-3xl md:text-5xl font-bold mb-2">
             Teams & <span className="text-gradient-primary">Points Table</span>
           </h2>
-          <p className="text-muted-foreground text-sm md:text-base">All 16 teams competing for glory</p>
+          <p className="text-muted-foreground text-sm md:text-base">All 12 teams competing for glory</p>
         </motion.div>
 
         {/* 2x2 Swipeable Team Grid */}

@@ -10,8 +10,6 @@ import logoFalcons from "@/assets/logos/darbhanga-falcons.png";
 import logoHurricanes from "@/assets/logos/darbhanga-hurricanes.png";
 import logoBlasters from "@/assets/logos/darbhanga-blasters.png";
 import logoSuperXI from "@/assets/logos/darbhanga-super-xi.png";
-import logoThunder from "@/assets/logos/darbhanga-thunder.png";
-import logoGladiators from "@/assets/logos/darbhanga-gladiators.png";
 
 export const teamLogoMap: Record<string, string> = {
   "Darbhanga Lions": logoLions,
@@ -26,6 +24,4 @@ export const teamLogoMap: Record<string, string> = {
   "Darbhanga Hurricanes": logoHurricanes,
   "Darbhanga Blasters": logoBlasters,
   "Darbhanga Super XI": logoSuperXI,
-  "Darbhanga Thunder": logoThunder,
-  "Darbhanga Gladiators": logoGladiators,
 };
