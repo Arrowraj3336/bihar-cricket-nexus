@@ -227,10 +227,10 @@ const TeamsSection = () => {
                       <span className={`font-heading text-sm font-bold ${i < 4 ? "text-accent" : "text-muted-foreground"}`}>{i + 1}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="flex items-center gap-2">
+                      <Link to={`/team/${team.slug}`} className="flex items-center gap-2 hover:text-primary transition-colors">
                         <TeamBadge team={team} size="table" />
                         <span className="font-medium text-xs whitespace-nowrap">{team.name}</span>
-                      </div>
+                      </Link>
                     </td>
                     <td className="text-center px-2 py-3 text-xs text-muted-foreground">{team.played}</td>
                     <td className="text-center px-2 py-3 text-xs font-semibold text-cricket-green">{team.won}</td>
