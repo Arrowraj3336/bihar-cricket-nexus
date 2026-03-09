@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { CricketBall, CricketStumps } from "./CricketDecorations";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
