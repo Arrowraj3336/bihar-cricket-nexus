@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { CricketBall, CricketStumps } from "./CricketDecorations";
 import { Trophy, ChevronLeft, ChevronRight } from "lucide-react";
@@ -30,8 +31,9 @@ const abbrMap: Record<string, string> = {
 };
 
 const defaultTeams = [...TEAM_NAMES];
+const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
-type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number };
+type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number; slug: string };
 
 const TEAMS_PER_PAGE = 4;
 
@@ -61,7 +63,7 @@ const TeamsSection = () => {
   const [teams, setTeams] = useState<TeamData[]>(
     defaultTeams.map(name => ({
       name, abbr: abbrMap[name] || "??", color: colorMap[name] || "hsl(0 0% 50%)",
-      logo: teamLogoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
+      logo: teamLogoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0, slug: toSlug(name),
     }))
   );
 
@@ -85,6 +87,7 @@ const TeamsSection = () => {
             abbr: abbrMap[name] || "??",
             color: colorMap[name] || "hsl(0 0% 50%)",
             logo: teamLogoMap[name] || "",
+            slug: toSlug(name),
             played: db?.played || 0,
             won: db?.won || 0,
             lost: db?.lost || 0,
@@ -102,6 +105,7 @@ const TeamsSection = () => {
         abbr: abbrMap[name] || "??",
         color: colorMap[name] || "hsl(0 0% 50%)",
         logo: teamLogoMap[name] || "",
+        slug: toSlug(name),
         played: 0, won: 0, lost: 0, pts: 0,
       })));
     };
@@ -176,12 +180,12 @@ const TeamsSection = () => {
                 dragElastic={0.8} onDragEnd={handleDragEnd}
                 className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 cursor-grab active:cursor-grabbing">
                 {currentTeams.map((team) => (
-                  <div key={team.abbr} className="relative bg-gradient-card rounded-2xl p-4 md:p-5 border border-border hover:border-primary/40 transition-all duration-300 shadow-card group">
+                  <Link key={team.abbr} to={`/team/${team.slug}`} className="relative bg-gradient-card rounded-2xl p-4 md:p-5 border border-border hover:border-primary/40 transition-all duration-300 shadow-card group block">
                     <div className="flex flex-col items-center gap-3">
                       <TeamBadge team={team} size="card" />
                       <span className="font-heading text-xs md:text-sm font-semibold text-center leading-tight">{team.name}</span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </motion.div>
             </AnimatePresence>
@@ -223,10 +227,10 @@ const TeamsSection = () => {
                       <span className={`font-heading text-sm font-bold ${i < 4 ? "text-accent" : "text-muted-foreground"}`}>{i + 1}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="flex items-center gap-2">
+                      <Link to={`/team/${team.slug}`} className="flex items-center gap-2 hover:text-primary transition-colors">
                         <TeamBadge team={team} size="table" />
                         <span className="font-medium text-xs whitespace-nowrap">{team.name}</span>
-                      </div>
+                      </Link>
                     </td>
                     <td className="text-center px-2 py-3 text-xs text-muted-foreground">{team.played}</td>
                     <td className="text-center px-2 py-3 text-xs font-semibold text-cricket-green">{team.won}</td>

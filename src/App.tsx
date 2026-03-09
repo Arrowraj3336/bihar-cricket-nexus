@@ -8,6 +8,7 @@ import Members from "./pages/Members";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
+import TeamDetail from "./pages/TeamDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/members" element={<Members />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/team/:slug" element={<TeamDetail />} />
           <Route path="/brl-admin-panel" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
