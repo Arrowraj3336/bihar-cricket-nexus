@@ -180,12 +180,12 @@ const TeamsSection = () => {
                 dragElastic={0.8} onDragEnd={handleDragEnd}
                 className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 cursor-grab active:cursor-grabbing">
                 {currentTeams.map((team) => (
-                  <div key={team.abbr} className="relative bg-gradient-card rounded-2xl p-4 md:p-5 border border-border hover:border-primary/40 transition-all duration-300 shadow-card group">
+                  <Link key={team.abbr} to={`/team/${team.slug}`} className="relative bg-gradient-card rounded-2xl p-4 md:p-5 border border-border hover:border-primary/40 transition-all duration-300 shadow-card group block">
                     <div className="flex flex-col items-center gap-3">
                       <TeamBadge team={team} size="card" />
                       <span className="font-heading text-xs md:text-sm font-semibold text-center leading-tight">{team.name}</span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </motion.div>
             </AnimatePresence>
