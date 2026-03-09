@@ -24,6 +24,7 @@ const App = () => (
           <Route path="/members" element={<Members />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/team/:slug" element={<TeamDetail />} />
           <Route path="/brl-admin-panel" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
