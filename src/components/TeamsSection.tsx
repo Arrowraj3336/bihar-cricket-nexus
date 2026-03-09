@@ -32,7 +32,7 @@ const abbrMap: Record<string, string> = {
 
 const defaultTeams = [...TEAM_NAMES];
 
-type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number };
+type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number; slug: string };
 
 const TEAMS_PER_PAGE = 4;
 
