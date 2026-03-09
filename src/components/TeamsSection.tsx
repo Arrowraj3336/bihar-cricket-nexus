@@ -63,7 +63,7 @@ const TeamsSection = () => {
   const [teams, setTeams] = useState<TeamData[]>(
     defaultTeams.map(name => ({
       name, abbr: abbrMap[name] || "??", color: colorMap[name] || "hsl(0 0% 50%)",
-      logo: teamLogoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0,
+      logo: teamLogoMap[name] || "", played: 0, won: 0, lost: 0, pts: 0, slug: toSlug(name),
     }))
   );
 
