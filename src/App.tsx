@@ -8,6 +8,7 @@ import Members from "./pages/Members";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import Admin from "./pages/Admin";
+import TeamDetail from "./pages/TeamDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
