@@ -31,6 +31,7 @@ const abbrMap: Record<string, string> = {
 };
 
 const defaultTeams = [...TEAM_NAMES];
+const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
 type TeamData = { name: string; abbr: string; color: string; logo: string; played: number; won: number; lost: number; pts: number; slug: string };
 
