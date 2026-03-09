@@ -87,6 +87,7 @@ const TeamsSection = () => {
             abbr: abbrMap[name] || "??",
             color: colorMap[name] || "hsl(0 0% 50%)",
             logo: teamLogoMap[name] || "",
+            slug: toSlug(name),
             played: db?.played || 0,
             won: db?.won || 0,
             lost: db?.lost || 0,
