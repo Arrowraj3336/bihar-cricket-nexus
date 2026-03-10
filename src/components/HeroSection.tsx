@@ -9,7 +9,7 @@ const HeroSection = () => {
       <img
         src={heroBatsman}
         alt="Cricket batsman striking the ball"
-        className="absolute inset-0 w-full h-full object-cover object-[center_60%]"
+        className="absolute inset-0 w-full h-full object-cover object-[center_60%] md:object-[center_70%] lg:object-[center_60%]"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-background/80" />
       <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10" />
@@ -27,7 +27,7 @@ const HeroSection = () => {
           <p className="text-foreground/70 font-display text-xs sm:text-sm md:text-base font-semibold tracking-[0.3em] uppercase mb-3">
             Season 2026 • Bihar's Biggest Cricket Tournament
           </p>
-          <h1 className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.05] mb-4">
+          <h1 className="font-heading text-4xl sm:text-5xl md:text-5xl lg:text-8xl font-black leading-[1.05] mb-4">
             <span className="text-foreground">WHERE RURAL</span>
             <br />
             <span className="text-foreground">TALENT</span>{" "}
