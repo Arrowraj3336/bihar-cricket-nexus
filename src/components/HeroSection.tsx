@@ -9,7 +9,7 @@ const HeroSection = () => {
       <img
         src={heroBatsman}
         alt="Cricket batsman striking the ball"
-        className="absolute inset-0 w-full h-full object-cover object-[center_60%]"
+        className="absolute inset-0 w-full h-full object-cover object-[center_60%] md:object-[center_70%] lg:object-[center_60%]"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-background/80" />
       <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10" />
