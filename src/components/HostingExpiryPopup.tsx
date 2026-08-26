@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Cloud, PlugZap } from "lucide-react";
+import { PlugZap } from "lucide-react";
+import noConnectionVideo from "@/assets/no-connection.mp4.asset.json";
 import {
   Dialog,
   DialogContent,
@@ -37,89 +38,50 @@ const HostingExpiryPopup = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="h-[65vh] min-h-[540px] w-[92vw] max-w-none overflow-hidden border-primary/25 bg-background p-0 shadow-glow sm:w-[65vw] sm:min-w-[620px] [&>button]:right-4 [&>button]:top-4 [&>button]:z-30 [&>button]:flex [&>button]:h-10 [&>button]:w-10 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:border [&>button]:border-primary/20 [&>button]:bg-background/80 [&>button]:text-foreground [&>button]:backdrop-blur-md">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-accent" />
-        <div className="absolute inset-0 cricket-ball-pattern opacity-60" />
+      <DialogContent className="h-[65dvh] max-h-[calc(100dvh-2rem)] w-[65vw] max-w-[calc(100vw-2rem)] overflow-hidden border-primary/20 bg-background p-0 shadow-glow lg:h-[50dvh] lg:w-[50vw] [&>button]:right-3 [&>button]:top-3 [&>button]:z-30 [&>button]:flex [&>button]:h-9 [&>button]:w-9 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:border [&>button]:border-primary/20 [&>button]:bg-background/90 [&>button]:text-foreground [&>button]:shadow-card [&>button]:backdrop-blur-md">
+        <div className="relative flex h-full min-h-0 flex-col">
+          <div className="relative min-h-0 flex-[1.2] overflow-hidden border-b border-primary/15 bg-muted">
+            <video
+              className="h-full w-full object-contain"
+              src={noConnectionVideo.url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              aria-label="Animated disconnected power adapter"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-background/80 to-transparent" />
+          </div>
 
-        <div className="relative z-10 flex h-full flex-col">
-          <DialogHeader className="px-6 pb-2 pt-7 text-center sm:px-10 sm:pt-8">
+          <DialogHeader className="shrink-0 px-4 pb-3 pt-3 text-center sm:px-7 sm:pb-4">
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-2 flex items-center justify-center gap-2 text-primary"
+              className="mb-1 flex items-center justify-center gap-1.5 text-primary"
             >
-              <PlugZap className="h-4 w-4" />
-              <span className="font-display text-xs font-bold uppercase tracking-widest">Service Notice</span>
+              <PlugZap className="h-3.5 w-3.5" />
+              <span className="font-display text-[9px] font-bold uppercase tracking-widest sm:text-[10px]">Important service notice</span>
             </motion.div>
-            <DialogTitle className="font-heading text-2xl font-black uppercase text-foreground sm:text-3xl">
+            <DialogTitle className="font-heading text-lg font-black uppercase leading-tight text-foreground sm:text-2xl">
               Hosting Plan Expiry
             </DialogTitle>
-            <DialogDescription className="mx-auto mt-2 max-w-xl font-display text-sm leading-relaxed text-muted-foreground sm:text-base">
-              The website hosting plan is going to expire on <strong className="font-bold text-primary">2 September 2026</strong>.
+            <DialogDescription className="mx-auto mt-1.5 max-w-2xl font-display text-[10px] leading-relaxed text-muted-foreground sm:text-xs lg:text-sm">
+              Our website hosting plan will expire on <strong className="font-bold text-primary">2 September 2026</strong>. To keep the Bihar Rural League website available without interruption, the service must be renewed before the countdown ends. Thank you for your attention and continued support.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden px-4">
-            <motion.div
-              className="absolute h-48 w-48 rounded-full bg-primary/10 blur-3xl sm:h-64 sm:w-64"
-              animate={{ scale: [0.9, 1.12, 0.9], opacity: [0.35, 0.7, 0.35] }}
-              transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
-            />
-
-            <div className="relative h-48 w-full max-w-md sm:h-56">
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => (
-                <motion.span
-                  key={angle}
-                  className="absolute left-1/2 top-[42%] h-1 w-12 origin-left bg-gradient-to-r from-primary/80 to-transparent"
-                  style={{ rotate: angle }}
-                  animate={{ scaleX: [0.25, 1, 0.4], opacity: [0, 0.9, 0] }}
-                  transition={{ duration: 1.8, repeat: Infinity, delay: index * 0.18, ease: "easeOut" }}
-                />
-              ))}
-
-              <motion.div
-                className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 text-primary drop-shadow-[0_0_24px_hsl(var(--primary)/0.45)]"
-                animate={{ y: [-4, 5, -4], scale: [1, 1.04, 1] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Cloud className="h-24 w-32 fill-primary/10 stroke-[1.25] sm:h-32 sm:w-44" />
-              </motion.div>
-
-              <svg className="absolute inset-0 h-full w-full text-primary" viewBox="0 0 440 220" aria-hidden="true">
-                <motion.path
-                  d="M240 116 C286 128 304 160 344 158 C382 156 395 179 382 203"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeDasharray="7 8"
-                  animate={{ strokeDashoffset: [0, -30] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                />
-              </svg>
-
-              <motion.div
-                className="absolute bottom-0 right-[4%] rotate-[-12deg] text-primary sm:right-[8%]"
-                animate={{ rotate: [-12, -8, -12], y: [0, -3, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <PlugZap className="h-14 w-14 fill-primary/10 stroke-[1.5] sm:h-16 sm:w-16" />
-              </motion.div>
-            </div>
-          </div>
-
-          <div className="border-t border-primary/15 bg-secondary/60 px-5 py-4 backdrop-blur-md sm:px-10 sm:py-5">
-            <p className="mb-3 text-center font-display text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <div className="shrink-0 border-t border-primary/15 bg-secondary/70 px-3 py-2.5 backdrop-blur-md sm:px-7 sm:py-3">
+            <p className="mb-1.5 text-center font-display text-[8px] font-bold uppercase tracking-widest text-muted-foreground sm:text-[9px]">
               Time remaining
             </p>
-            <div className="mx-auto grid max-w-lg grid-cols-3 gap-2 sm:gap-4">
+            <div className="mx-auto grid max-w-lg grid-cols-3 gap-1 sm:gap-3">
               {countdown.map((item, index) => (
                 <div key={item.label} className="relative text-center">
-                  {index > 0 && <span className="absolute -left-1 top-2 font-heading text-xl text-primary/50 sm:-left-2 sm:text-2xl">:</span>}
-                  <span className="block font-heading text-2xl font-black tabular-nums text-foreground sm:text-4xl">
+                  {index > 0 && <span className="absolute -left-0.5 top-0 font-heading text-base text-primary/50 sm:-left-1 sm:text-xl">:</span>}
+                  <span className="block font-heading text-lg font-black leading-none tabular-nums text-foreground sm:text-2xl">
                     {String(item.value).padStart(2, "0")}
                   </span>
-                  <span className="font-display text-[9px] font-semibold uppercase tracking-widest text-muted-foreground sm:text-[11px]">
+                  <span className="font-display text-[7px] font-semibold uppercase tracking-widest text-muted-foreground sm:text-[9px]">
                     {item.label}
                   </span>
                 </div>
