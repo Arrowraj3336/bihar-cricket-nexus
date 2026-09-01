@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { PlugZap } from "lucide-react";
-import noConnectionVideo from "@/assets/no-connection.mp4.asset.json";
+import noConnectionVideo from "@/assets/no-connection.webm.asset.json";
 import {
   Dialog,
   DialogContent,
