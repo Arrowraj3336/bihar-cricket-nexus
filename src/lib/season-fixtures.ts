@@ -27,7 +27,7 @@ const VENUE = "Nagendrajha Stadium, Darbhanga";
  * 11 rounds x 6 matches = 66 league fixtures.
  */
 function buildSchedule(): Fixture[] {
-  const teams = [...TEAM_NAMES];
+  const teams: string[] = [...TEAM_NAMES];
   const n = teams.length;
   const rounds = n - 1;
   const half = n / 2;
