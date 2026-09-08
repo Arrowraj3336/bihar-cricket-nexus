@@ -2,15 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
-import Index from "./pages/Index";
-import Members from "./pages/Members";
-import Contact from "./pages/Contact";
-import Gallery from "./pages/Gallery";
+import HostingServer from "./pages/HostingServer";
 import Admin from "./pages/Admin";
-import TeamDetail from "./pages/TeamDetail";
-import NotFound from "./pages/NotFound";
+
+// NOTE: The public site is temporarily hidden. All pages below still exist
+// (Index, Members, Contact, Gallery, TeamDetail, CalendarPage) and can be
+// restored by re-enabling their routes.
 
 const queryClient = new QueryClient();
 
@@ -22,14 +21,11 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/members" element={<Members />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/team/:slug" element={<TeamDetail />} />
+          <Route path="/" element={<HostingServer />} />
+          {/* Admin remains reachable for site management */}
           <Route path="/brl-admin-panel" element={<Admin />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          {/* Every other page is hidden while the site is being updated */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
