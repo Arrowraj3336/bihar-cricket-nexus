@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer, Sky } from "@react-three/drei";
 import * as THREE from "three";
 
-const IMPACT_TIME = 3.8;
-const REVEAL_END = 8.2;
-const FAR_WICKET_Z = -20.12;
+const PITCH_LENGTH = 20.12;
+const PITCH_WIDTH = 3.05;
+const WICKET_Z = -PITCH_LENGTH / 2;
+const BALL_RADIUS = 0.036;
+const IMPACT_TIME = 4.7;
+const SCREEN_REVEAL_TIME = 6.05;
+const SEQUENCE_END = 10.2;
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const smoothstep = (value: number) => {
@@ -25,140 +29,242 @@ function useReducedMotion() {
   return reduced;
 }
 
-function createGrassTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 512;
-  const context = canvas.getContext("2d");
-  if (!context) return new THREE.CanvasTexture(canvas);
-
-  context.fillStyle = "#285e32";
-  context.fillRect(0, 0, 512, 512);
-  let seed = 9417;
-  const random = () => {
+function seededRandom(seedValue: number) {
+  let seed = seedValue;
+  return () => {
     seed = (seed * 16807) % 2147483647;
     return (seed - 1) / 2147483646;
   };
-  for (let y = 0; y < 512; y += 32) {
-    context.fillStyle = y % 64 === 0 ? "rgba(102,155,83,.16)" : "rgba(9,61,28,.16)";
-    context.fillRect(0, y, 512, 32);
+}
+
+function createGrassTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1024;
+  const context = canvas.getContext("2d");
+  if (!context) return new THREE.CanvasTexture(canvas);
+  const random = seededRandom(9417);
+  const base = context.createLinearGradient(0, 0, 1024, 1024);
+  base.addColorStop(0, "#387f3d");
+  base.addColorStop(0.5, "#286c33");
+  base.addColorStop(1, "#347a39");
+  context.fillStyle = base;
+  context.fillRect(0, 0, 1024, 1024);
+  for (let stripe = 0; stripe < 16; stripe += 1) {
+    context.fillStyle = stripe % 2 === 0 ? "rgba(184,218,112,.075)" : "rgba(8,62,22,.07)";
+    context.fillRect(0, stripe * 64, 1024, 64);
   }
-  for (let index = 0; index < 9000; index += 1) {
-    const shade = 42 + Math.floor(random() * 48);
-    context.fillStyle = `rgba(${18 + Math.floor(random() * 25)},${shade + 42},${24 + Math.floor(random() * 28)},${0.12 + random() * 0.2})`;
-    context.fillRect(random() * 512, random() * 512, 1, 2 + random() * 3);
+  for (let index = 0; index < 24000; index += 1) {
+    const green = 75 + Math.floor(random() * 85);
+    context.fillStyle = `rgba(${20 + Math.floor(random() * 38)},${green},${20 + Math.floor(random() * 42)},${0.14 + random() * 0.22})`;
+    const x = random() * 1024;
+    const y = random() * 1024;
+    context.fillRect(x, y, 1, 2 + random() * 5);
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(7, 7);
-  texture.anisotropy = 8;
+  texture.repeat.set(5, 5);
+  texture.anisotropy = 12;
+  return texture;
+}
+
+function createGrassBumpTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 256;
+  const context = canvas.getContext("2d");
+  if (!context) return new THREE.CanvasTexture(canvas);
+  const random = seededRandom(6211);
+  context.fillStyle = "#787878";
+  context.fillRect(0, 0, 256, 256);
+  for (let index = 0; index < 10000; index += 1) {
+    const shade = 75 + Math.floor(random() * 105);
+    context.fillStyle = `rgb(${shade},${shade},${shade})`;
+    context.fillRect(random() * 256, random() * 256, 1, 1 + random() * 3);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(22, 22);
   return texture;
 }
 
 function createPitchTexture() {
   const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 1024;
+  canvas.width = 512;
+  canvas.height = 2048;
   const context = canvas.getContext("2d");
   if (!context) return new THREE.CanvasTexture(canvas);
-
-  const gradient = context.createLinearGradient(0, 0, 256, 0);
-  gradient.addColorStop(0, "#937750");
-  gradient.addColorStop(0.18, "#b49a6c");
-  gradient.addColorStop(0.5, "#c8b17c");
-  gradient.addColorStop(0.82, "#aa8c5e");
-  gradient.addColorStop(1, "#806541");
+  const random = seededRandom(1709);
+  const gradient = context.createLinearGradient(0, 0, 512, 0);
+  gradient.addColorStop(0, "#95794e");
+  gradient.addColorStop(0.16, "#b69c6b");
+  gradient.addColorStop(0.5, "#ccb47b");
+  gradient.addColorStop(0.84, "#aa8d5d");
+  gradient.addColorStop(1, "#80633f");
   context.fillStyle = gradient;
-  context.fillRect(0, 0, 256, 1024);
-  let seed = 1709;
-  const random = () => {
-    seed = (seed * 48271) % 2147483647;
-    return seed / 2147483647;
-  };
-  for (let index = 0; index < 6500; index += 1) {
-    const value = 85 + Math.floor(random() * 95);
-    context.fillStyle = `rgba(${value},${Math.floor(value * 0.82)},${Math.floor(value * 0.53)},${0.04 + random() * 0.12})`;
-    context.fillRect(random() * 256, random() * 1024, 1 + random() * 2, 2 + random() * 8);
+  context.fillRect(0, 0, 512, 2048);
+  for (let index = 0; index < 15000; index += 1) {
+    const value = 80 + Math.floor(random() * 120);
+    context.fillStyle = `rgba(${value},${Math.floor(value * 0.82)},${Math.floor(value * 0.52)},${0.04 + random() * 0.17})`;
+    context.fillRect(random() * 512, random() * 2048, 1 + random() * 3, 3 + random() * 13);
   }
-  context.strokeStyle = "rgba(255,255,245,.9)";
-  context.lineWidth = 7;
-  [70, 954].forEach((y) => {
+  context.strokeStyle = "rgba(255,255,248,.96)";
+  context.lineWidth = 10;
+  [150, 1898].forEach((y) => {
     context.beginPath();
     context.moveTo(0, y);
-    context.lineTo(256, y);
+    context.lineTo(512, y);
+    context.stroke();
+  });
+  context.lineWidth = 5;
+  [112, 1936].forEach((y) => {
+    context.beginPath();
+    context.moveTo(76, y);
+    context.lineTo(436, y);
     context.stroke();
   });
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  texture.anisotropy = 12;
+  return texture;
+}
+
+function createWoodTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 512;
+  const context = canvas.getContext("2d");
+  if (!context) return new THREE.CanvasTexture(canvas);
+  const random = seededRandom(311);
+  const gradient = context.createLinearGradient(0, 0, 128, 0);
+  gradient.addColorStop(0, "#d6ad64");
+  gradient.addColorStop(0.48, "#f0d18f");
+  gradient.addColorStop(1, "#bd8b48");
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 128, 512);
+  for (let index = 0; index < 130; index += 1) {
+    context.strokeStyle = `rgba(91,52,20,${0.035 + random() * 0.08})`;
+    context.lineWidth = 1 + random() * 2;
+    context.beginPath();
+    const x = random() * 128;
+    context.moveTo(x, 0);
+    context.bezierCurveTo(x + random() * 10 - 5, 160, x + random() * 12 - 6, 350, x + random() * 8 - 4, 512);
+    context.stroke();
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function createBallTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 512;
+  const context = canvas.getContext("2d");
+  if (!context) return new THREE.CanvasTexture(canvas);
+  const random = seededRandom(713);
+  context.fillStyle = "#99151d";
+  context.fillRect(0, 0, 512, 512);
+  for (let index = 0; index < 12000; index += 1) {
+    const tone = 80 + Math.floor(random() * 70);
+    context.fillStyle = `rgba(${tone + 50},${18 + Math.floor(random() * 20)},${25 + Math.floor(random() * 18)},${0.04 + random() * 0.12})`;
+    context.fillRect(random() * 512, random() * 512, 1, 1);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
 function createScoreboardTexture() {
   const canvas = document.createElement("canvas");
-  canvas.width = 1600;
-  canvas.height = 700;
+  canvas.width = 2048;
+  canvas.height = 960;
   const context = canvas.getContext("2d");
   if (!context) return new THREE.CanvasTexture(canvas);
-
-  const gradient = context.createLinearGradient(0, 0, 1600, 700);
-  gradient.addColorStop(0, "#150203");
-  gradient.addColorStop(0.5, "#3b0508");
-  gradient.addColorStop(1, "#100102");
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, 1600, 700);
-
-  context.strokeStyle = "rgba(204,38,48,.18)";
+  const background = context.createLinearGradient(0, 0, 2048, 960);
+  background.addColorStop(0, "#090b0e");
+  background.addColorStop(0.45, "#380509");
+  background.addColorStop(1, "#090a0d");
+  context.fillStyle = background;
+  context.fillRect(0, 0, 2048, 960);
+  context.strokeStyle = "rgba(255,63,68,.14)";
   context.lineWidth = 2;
-  for (let x = 0; x < 1600; x += 32) {
+  for (let x = 0; x < 2048; x += 16) {
     context.beginPath();
     context.moveTo(x, 0);
-    context.lineTo(x, 700);
+    context.lineTo(x, 960);
     context.stroke();
   }
-  for (let y = 0; y < 700; y += 32) {
+  for (let y = 0; y < 960; y += 16) {
     context.beginPath();
     context.moveTo(0, y);
-    context.lineTo(1600, y);
+    context.lineTo(2048, y);
     context.stroke();
   }
-
-  context.fillStyle = "#f6eee9";
+  context.save();
+  context.translate(1024, 480);
+  context.strokeStyle = "rgba(233,34,45,.75)";
+  context.lineWidth = 12;
+  context.beginPath();
+  context.arc(0, 0, 350, 0, Math.PI * 2);
+  context.stroke();
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(0, 0, 390, 0, Math.PI * 2);
+  context.stroke();
+  context.fillStyle = "rgba(198,16,28,.23)";
+  context.beginPath();
+  context.moveTo(-1024, -380);
+  context.lineTo(-350, -90);
+  context.lineTo(-550, 0);
+  context.lineTo(-350, 90);
+  context.lineTo(-1024, 380);
+  context.closePath();
+  context.fill();
+  context.scale(-1, 1);
+  context.fill();
+  context.restore();
+  context.fillStyle = "#ff2332";
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.font = "700 122px Arial, sans-serif";
-  context.shadowColor = "rgba(255,35,48,.9)";
-  context.shadowBlur = 36;
-  context.fillText("HOSTING PLAN", 800, 285);
-  context.fillText("EXPIRED", 800, 435);
-
+  context.font = "900 94px Arial, sans-serif";
+  context.fillText("OUT", 1024, 190);
+  context.shadowColor = "rgba(255,28,42,.9)";
+  context.shadowBlur = 34;
+  context.fillStyle = "#fff9ef";
+  context.font = "800 126px Arial, sans-serif";
+  context.fillText("HOSTING PLAN", 1024, 445);
+  context.fillText("EXPIRED", 1024, 605);
+  context.shadowBlur = 0;
+  context.fillStyle = "rgba(255,248,232,.78)";
+  context.font = "600 34px Arial, sans-serif";
+  context.fillText("DECISION CONFIRMED", 1024, 790);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  texture.anisotropy = 12;
   return texture;
 }
 
 function Field() {
   const grass = useMemo(createGrassTexture, []);
+  const grassBump = useMemo(createGrassBumpTexture, []);
   const pitch = useMemo(createPitchTexture, []);
   useEffect(() => () => {
     grass.dispose();
+    grassBump.dispose();
     pitch.dispose();
-  }, [grass, pitch]);
-
+  }, [grass, grassBump, pitch]);
   return (
     <>
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
-        <circleGeometry args={[50, 128]} />
-        <meshStandardMaterial map={grass} roughness={0.94} color="#8cb17f" />
+        <circleGeometry args={[68, 160]} />
+        <meshStandardMaterial map={grass} bumpMap={grassBump} bumpScale={0.055} roughness={0.92} color="#9cc78f" />
       </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0.018, 0]} receiveShadow>
-        <planeGeometry args={[3.15, 23]} />
-        <meshStandardMaterial map={pitch} roughness={0.88} />
+      <mesh rotation-x={-Math.PI / 2} position-y={0.014} receiveShadow>
+        <planeGeometry args={[PITCH_WIDTH, PITCH_LENGTH + 2.8, 1, 20]} />
+        <meshStandardMaterial map={pitch} roughness={0.86} bumpMap={grassBump} bumpScale={0.018} />
       </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0.028, 0]}>
-        <ringGeometry args={[41.8, 42.03, 128]} />
-        <meshBasicMaterial color="#efe9dd" transparent opacity={0.62} />
+      <mesh rotation-x={-Math.PI / 2} position-y={0.027}>
+        <ringGeometry args={[59.7, 59.84, 160]} />
+        <meshStandardMaterial color="#f4eee1" roughness={0.72} />
       </mesh>
     </>
   );
@@ -167,350 +273,338 @@ function Field() {
 function Stadium() {
   const crowd = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  const colors = useMemo(() => ["#8e151c", "#d8d2c5", "#23303b", "#a78735"], []);
-
+  const colors = useMemo(() => ["#a51c27", "#f1e8d5", "#164d79", "#e4a92f", "#2d613b", "#242a32"], []);
   useEffect(() => {
     if (!crowd.current) return;
     const color = new THREE.Color();
-    for (let index = 0; index < 520; index += 1) {
-      const angle = (index / 520) * Math.PI * 2;
-      const row = index % 7;
-      const radius = 48 + row * 1.38;
-      dummy.position.set(Math.cos(angle) * radius, 2.3 + row * 1.1, Math.sin(angle) * radius);
+    const random = seededRandom(8441);
+    for (let index = 0; index < 1250; index += 1) {
+      const angle = random() * Math.PI * 2;
+      const row = Math.floor(random() * 11);
+      const radius = 70 + row * 1.75;
+      dummy.position.set(Math.cos(angle) * radius, 2.1 + row * 0.86, Math.sin(angle) * radius);
       dummy.rotation.y = -angle;
-      dummy.scale.set(0.55, 0.65, 0.5);
+      dummy.scale.set(0.36 + random() * 0.16, 0.48 + random() * 0.24, 0.32 + random() * 0.14);
       dummy.updateMatrix();
       crowd.current.setMatrixAt(index, dummy.matrix);
-      color.set(colors[index % colors.length]);
+      color.set(colors[Math.floor(random() * colors.length)]);
       crowd.current.setColorAt(index, color);
     }
     crowd.current.instanceMatrix.needsUpdate = true;
     if (crowd.current.instanceColor) crowd.current.instanceColor.needsUpdate = true;
   }, [colors, dummy]);
-
   return (
     <group>
-      <mesh position={[0, 7, 0]} receiveShadow>
-        <cylinderGeometry args={[65, 48, 18, 128, 4, true]} />
-        <meshStandardMaterial color="#4a4d4f" roughness={0.72} side={THREE.BackSide} />
+      <mesh position-y={7.5} receiveShadow>
+        <cylinderGeometry args={[92, 69, 20, 160, 8, true]} />
+        <meshStandardMaterial color="#8a9295" roughness={0.78} side={THREE.BackSide} />
       </mesh>
-      {[49, 52.5, 56, 59.5].map((radius, index) => (
-        <mesh key={radius} rotation-x={Math.PI / 2} position-y={3.1 + index * 2.25} receiveShadow>
-          <torusGeometry args={[radius, 1.45, 4, 128]} />
-          <meshStandardMaterial color={index % 2 === 0 ? "#741016" : "#c7c1b6"} roughness={0.68} />
+      {[72, 76, 80, 84, 88].map((radius, index) => (
+        <mesh key={radius} rotation-x={Math.PI / 2} position-y={3 + index * 2.25} receiveShadow>
+          <torusGeometry args={[radius, 1.25, 4, 160]} />
+          <meshStandardMaterial color={index % 2 === 0 ? "#a61e28" : "#d8d4ca"} roughness={0.7} />
         </mesh>
       ))}
-      <instancedMesh ref={crowd} args={[undefined, undefined, 520]}>
-        <boxGeometry args={[0.7, 0.8, 0.72]} />
-        <meshStandardMaterial roughness={0.9} />
+      {Array.from({ length: 20 }, (_, index) => {
+        const angle = (index / 20) * Math.PI * 2;
+        return (
+          <mesh key={index} position={[Math.cos(angle) * 79, 7.4, Math.sin(angle) * 79]} rotation-y={-angle}>
+            <boxGeometry args={[1.45, 12, 0.35]} />
+            <meshStandardMaterial color="#c7c5bf" roughness={0.68} />
+          </mesh>
+        );
+      })}
+      <instancedMesh ref={crowd} args={[undefined, undefined, 1250]}>
+        <capsuleGeometry args={[0.28, 0.35, 3, 6]} />
+        <meshStandardMaterial roughness={0.88} />
       </instancedMesh>
-      <mesh rotation-x={Math.PI / 2} position-y={14.2}>
-        <torusGeometry args={[61, 2.8, 6, 128]} />
-        <meshStandardMaterial color="#1c2227" metalness={0.55} roughness={0.38} />
+      <mesh rotation-x={Math.PI / 2} position-y={15.6} castShadow>
+        <torusGeometry args={[91, 3.5, 8, 160]} />
+        <meshStandardMaterial color="#43494e" metalness={0.48} roughness={0.4} />
       </mesh>
-      {[-1, 1].flatMap((xSign) =>
-        [-1, 1].map((zSign) => (
-          <group key={`${xSign}-${zSign}`} position={[xSign * 38, 0, zSign * 32]}>
-            <mesh position-y={12} castShadow>
-              <cylinderGeometry args={[0.16, 0.28, 24, 12]} />
-              <meshStandardMaterial color="#73777a" metalness={0.8} roughness={0.25} />
+      {[-1, 1].flatMap((xSign) => [-1, 1].map((zSign) => (
+        <group key={`${xSign}-${zSign}`} position={[xSign * 52, 0, zSign * 46]}>
+          <mesh position-y={16} castShadow>
+            <cylinderGeometry args={[0.15, 0.34, 32, 12]} />
+            <meshStandardMaterial color="#9aa0a3" metalness={0.78} roughness={0.28} />
+          </mesh>
+          <mesh position={[0, 31.2, 0]}>
+            <boxGeometry args={[8.8, 3.4, 0.45]} />
+            <meshStandardMaterial color="#e5e9e6" metalness={0.35} roughness={0.4} />
+          </mesh>
+          {Array.from({ length: 12 }, (_, index) => (
+            <mesh key={index} position={[-3.75 + (index % 6) * 1.5, 30.45 + Math.floor(index / 6) * 1.5, -0.28]}>
+              <boxGeometry args={[1.18, 1.02, 0.18]} />
+              <meshStandardMaterial color="#fff4d2" emissive="#fff0c2" emissiveIntensity={0.32} />
             </mesh>
-            <mesh position={[0, 24.1, 0]} rotation-x={-0.12 * zSign}>
-              <boxGeometry args={[7, 1.7, 0.55]} />
-              <meshStandardMaterial color="#f5efe3" emissive="#fff0cf" emissiveIntensity={2.8} />
-            </mesh>
-          </group>
-        )),
-      )}
+          ))}
+        </group>
+      ))}
     </group>
   );
 }
 
 function Wicket({ position, far = false, animationTime }: { position: [number, number, number]; far?: boolean; animationTime: React.MutableRefObject<number> }) {
-  const bailLeft = useRef<THREE.Mesh>(null);
-  const bailRight = useRef<THREE.Mesh>(null);
-  const middleStump = useRef<THREE.Mesh>(null);
-  const sideStump = useRef<THREE.Mesh>(null);
-
+  const wood = useMemo(createWoodTexture, []);
+  const bails = [useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null)];
+  const stumps = [useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null)];
+  useEffect(() => () => wood.dispose(), [wood]);
   useFrame(() => {
     if (!far) return;
-    const elapsed = Math.max(0, animationTime.current - IMPACT_TIME);
-    const flight = Math.min(elapsed, 1.6);
-    if (bailLeft.current) {
-      bailLeft.current.position.set(-0.16 - flight * 1.1, 1.57 + flight * 1.5 - 1.4 * flight * flight, flight * 0.65);
-      bailLeft.current.rotation.set(flight * 5.5, flight * 2.4, -flight * 4.4);
-    }
-    if (bailRight.current) {
-      bailRight.current.position.set(0.16 + flight * 0.85, 1.57 + flight * 1.25 - 1.3 * flight * flight, -flight * 0.48);
-      bailRight.current.rotation.set(-flight * 4.8, flight * 3.1, flight * 5.2);
-    }
-    if (middleStump.current) middleStump.current.rotation.x = Math.min(elapsed * 1.7, 0.42);
-    if (sideStump.current) sideStump.current.rotation.z = -Math.min(elapsed * 1.25, 0.22);
+    const t = Math.max(0, animationTime.current - IMPACT_TIME);
+    const gravity = 9.81;
+    const bailVelocities = [[-1.05, 2.35, 0.9], [0.78, 2.08, -0.4]];
+    bails.forEach((ref, index) => {
+      const mesh = ref.current;
+      if (!mesh) return;
+      if (t <= 0) {
+        mesh.position.set(index === 0 ? -0.115 : 0.115, 0.738, 0);
+        mesh.rotation.set(0, 0, Math.PI / 2);
+        return;
+      }
+      const flight = Math.min(t, 0.72);
+      const velocity = bailVelocities[index];
+      mesh.position.set(
+        (index === 0 ? -0.115 : 0.115) + velocity[0] * flight,
+        Math.max(0.035, 0.738 + velocity[1] * flight - 0.5 * gravity * flight * flight),
+        velocity[2] * flight,
+      );
+      mesh.rotation.set(flight * (index ? -14 : 12), flight * 9, Math.PI / 2 + flight * (index ? 11 : -13));
+    });
+    stumps.forEach((ref, index) => {
+      const mesh = ref.current;
+      if (!mesh) return;
+      const delay = index * 0.025;
+      const response = Math.max(0, t - delay);
+      mesh.rotation.x = index === 1 ? Math.min(response * 1.7, 1.1) : Math.min(response * (index ? 0.72 : 0.38), index ? 0.34 : 0.17);
+      mesh.rotation.z = index === 1 ? -Math.min(response * 0.62, 0.28) : (index - 1) * Math.min(response * 0.18, 0.1);
+    });
   });
-
   return (
     <group position={position}>
-      {[-0.28, 0, 0.28].map((x, index) => (
-        <mesh
-          key={x}
-          ref={index === 1 ? middleStump : index === 2 ? sideStump : undefined}
-          position={[x, 0.76, 0]}
-          castShadow
-        >
-          <cylinderGeometry args={[0.045, 0.055, 1.52, 18]} />
-          <meshStandardMaterial color="#f1dfba" roughness={0.54} />
+      {[-0.114, 0, 0.114].map((x, index) => (
+        <mesh key={x} ref={stumps[index]} position={[x, 0.3555, 0]} castShadow>
+          <cylinderGeometry args={[0.019, 0.021, 0.711, 18]} />
+          <meshStandardMaterial map={wood} roughness={0.48} />
         </mesh>
       ))}
-      <mesh ref={bailLeft} position={[-0.16, 1.57, 0]} rotation-z={Math.PI / 2} castShadow>
-        <cylinderGeometry args={[0.031, 0.031, 0.38, 14]} />
-        <meshStandardMaterial color="#f1dfba" roughness={0.54} />
-      </mesh>
-      <mesh ref={bailRight} position={[0.16, 1.57, 0]} rotation-z={Math.PI / 2} castShadow>
-        <cylinderGeometry args={[0.031, 0.031, 0.38, 14]} />
-        <meshStandardMaterial color="#f1dfba" roughness={0.54} />
-      </mesh>
-    </group>
-  );
-}
-
-function Scoreboard({ animationTime }: { animationTime: React.MutableRefObject<number> }) {
-  const texture = useMemo(createScoreboardTexture, []);
-  const screenMaterial = useRef<THREE.MeshStandardMaterial>(null);
-  useEffect(() => () => texture.dispose(), [texture]);
-
-  useFrame(() => {
-    if (!screenMaterial.current) return;
-    const reveal = smoothstep((animationTime.current - IMPACT_TIME - 0.65) / 1.4);
-    screenMaterial.current.emissiveIntensity = reveal * 1.7;
-    screenMaterial.current.opacity = 0.18 + reveal * 0.82;
-  });
-
-  return (
-    <group position={[0, 14.2, -48]}>
-      <mesh position={[0, 0, -0.5]} castShadow>
-        <boxGeometry args={[24, 11, 1.1]} />
-        <meshStandardMaterial color="#151719" metalness={0.82} roughness={0.28} />
-      </mesh>
-      <mesh position={[0, 0, 0.08]}>
-        <planeGeometry args={[22.2, 9.25]} />
-        <meshStandardMaterial
-          ref={screenMaterial}
-          map={texture}
-          emissiveMap={texture}
-          emissive="#8d1018"
-          emissiveIntensity={0}
-          transparent
-          opacity={0.18}
-          toneMapped={false}
-        />
-      </mesh>
-      {[-11.6, 11.6].map((x) => (
-        <mesh key={x} position={[x, -8.8, -0.2]}>
-          <cylinderGeometry args={[0.42, 0.62, 8.2, 16]} />
-          <meshStandardMaterial color="#363a3d" metalness={0.75} roughness={0.34} />
+      {[-0.115, 0.115].map((x, index) => (
+        <mesh key={x} ref={bails[index]} position={[x, 0.738, 0]} rotation-z={Math.PI / 2} castShadow>
+          <cylinderGeometry args={[0.012, 0.012, 0.25, 14]} />
+          <meshStandardMaterial map={wood} roughness={0.5} />
         </mesh>
       ))}
     </group>
   );
 }
 
-function DustBurst({ animationTime }: { animationTime: React.MutableRefObject<number> }) {
-  const dust = useRef<THREE.InstancedMesh>(null);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const vectors = useMemo(
-    () => Array.from({ length: 34 }, (_, index) => ({
-      x: Math.sin(index * 2.31) * (0.35 + (index % 7) * 0.08),
-      y: 0.45 + (index % 5) * 0.18,
-      z: Math.cos(index * 1.73) * (0.3 + (index % 6) * 0.09),
-      scale: 0.035 + (index % 4) * 0.014,
-    })),
-    [],
-  );
-
-  useFrame(() => {
-    if (!dust.current) return;
-    const elapsed = animationTime.current - IMPACT_TIME;
-    vectors.forEach((velocity, index) => {
-      if (elapsed < 0 || elapsed > 1.7) {
-        dummy.scale.setScalar(0);
+function CricketBall({ animationTime, ballPosition }: { animationTime: React.MutableRefObject<number>; ballPosition: React.MutableRefObject<THREE.Vector3> }) {
+  const ball = useRef<THREE.Group>(null);
+  const leather = useMemo(createBallTexture, []);
+  useEffect(() => () => leather.dispose(), [leather]);
+  useFrame((_, rawDelta) => {
+    const group = ball.current;
+    if (!group) return;
+    const t = animationTime.current;
+    let x = 0;
+    let y = BALL_RADIUS;
+    let z = WICKET_Z;
+    if (t <= IMPACT_TIME) {
+      const progress = clamp01(t / IMPACT_TIME);
+      z = THREE.MathUtils.lerp(18.5, WICKET_Z, progress);
+      const swing = Math.sin(progress * Math.PI) * 0.13 + Math.pow(progress, 3) * -0.105;
+      x = 0.045 + swing;
+      const bounceProgress = 0.73;
+      if (progress < bounceProgress) {
+        const phase = progress / bounceProgress;
+        y = 1.95 * (1 - phase) + BALL_RADIUS + Math.sin(phase * Math.PI) * 0.34;
       } else {
-        dummy.position.set(
-          velocity.x * elapsed,
-          0.52 + velocity.y * elapsed - 0.55 * elapsed * elapsed,
-          FAR_WICKET_Z + velocity.z * elapsed,
-        );
-        dummy.scale.setScalar(velocity.scale * (1 - elapsed / 1.7));
+        const phase = (progress - bounceProgress) / (1 - bounceProgress);
+        y = BALL_RADIUS + Math.sin(phase * Math.PI) * 0.27 + phase * 0.28;
+      }
+    } else {
+      const after = Math.min(t - IMPACT_TIME, 1.1);
+      x = -0.06 - after * 0.74;
+      y = Math.max(BALL_RADIUS, 0.31 + after * 0.42 - 0.5 * 2.8 * after * after);
+      z = WICKET_Z + after * 0.85;
+    }
+    group.position.set(x, y, z);
+    ballPosition.current.copy(group.position);
+    const delta = Math.min(rawDelta, 0.05);
+    group.rotation.x += delta * 31;
+    group.rotation.z += delta * 7;
+  });
+  return (
+    <group ref={ball}>
+      <mesh castShadow>
+        <sphereGeometry args={[BALL_RADIUS, 40, 28]} />
+        <meshPhysicalMaterial map={leather} roughness={0.43} clearcoat={0.28} clearcoatRoughness={0.48} />
+      </mesh>
+      <mesh rotation-x={Math.PI / 2}>
+        <torusGeometry args={[BALL_RADIUS * 0.985, BALL_RADIUS * 0.035, 7, 80]} />
+        <meshStandardMaterial color="#eee1c7" roughness={0.66} />
+      </mesh>
+    </group>
+  );
+}
+
+function ImpactDust({ animationTime }: { animationTime: React.MutableRefObject<number> }) {
+  const particles = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const velocities = useMemo(() => Array.from({ length: 30 }, (_, index) => ({
+    x: Math.sin(index * 2.31) * (0.11 + (index % 5) * 0.025),
+    y: 0.15 + (index % 4) * 0.07,
+    z: Math.cos(index * 1.73) * (0.09 + (index % 6) * 0.02),
+  })), []);
+  useFrame(() => {
+    if (!particles.current) return;
+    const t = animationTime.current - IMPACT_TIME;
+    velocities.forEach((velocity, index) => {
+      if (t < 0 || t > 0.8) dummy.scale.setScalar(0);
+      else {
+        dummy.position.set(velocity.x * t, 0.04 + velocity.y * t - 0.5 * 0.72 * t * t, WICKET_Z + velocity.z * t);
+        dummy.scale.setScalar((0.008 + (index % 3) * 0.004) * (1 - t / 0.8));
       }
       dummy.updateMatrix();
-      dust.current?.setMatrixAt(index, dummy.matrix);
+      particles.current?.setMatrixAt(index, dummy.matrix);
     });
-    dust.current.instanceMatrix.needsUpdate = true;
+    particles.current.instanceMatrix.needsUpdate = true;
   });
-
   return (
-    <instancedMesh ref={dust} args={[undefined, undefined, vectors.length]}>
-      <sphereGeometry args={[1, 6, 5]} />
-      <meshStandardMaterial color="#c6aa78" transparent opacity={0.72} roughness={1} />
+    <instancedMesh ref={particles} args={[undefined, undefined, velocities.length]}>
+      <sphereGeometry args={[1, 5, 4]} />
+      <meshStandardMaterial color="#d3b67d" transparent opacity={0.7} roughness={1} />
     </instancedMesh>
   );
 }
 
-function CricketBall({ animationTime }: { animationTime: React.MutableRefObject<number> }) {
-  const ball = useRef<THREE.Group>(null);
-  const throwPath = useMemo(
-    () => new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.85, 2.7, 40),
-      new THREE.Vector3(0.35, 2.25, 30),
-      new THREE.Vector3(-0.35, 1.65, 15),
-      new THREE.Vector3(0.48, 1.12, 0),
-      new THREE.Vector3(0.08, 0.76, FAR_WICKET_Z),
-    ]),
-    [],
-  );
-
-  useFrame((_, rawDelta) => {
-    if (!ball.current) return;
-    const elapsed = animationTime.current;
-    if (elapsed <= IMPACT_TIME) {
-      const progress = smootherstep(elapsed / IMPACT_TIME);
-      const point = throwPath.getPointAt(progress);
-      ball.current.position.copy(point);
-      ball.current.rotation.x += Math.min(rawDelta, 0.05) * 15;
-      ball.current.rotation.z += Math.min(rawDelta, 0.05) * 4.5;
-    } else {
-      const after = Math.min(elapsed - IMPACT_TIME, 1.3);
-      ball.current.position.set(0.08 - after * 1.2, 0.76 + after * 0.48 - after * after * 0.4, FAR_WICKET_Z - 0.12 + after * 1.35);
-      ball.current.rotation.x += Math.min(rawDelta, 0.05) * 8;
+function StadiumScreen({ animationTime }: { animationTime: React.MutableRefObject<number> }) {
+  const texture = useMemo(createScoreboardTexture, []);
+  const screen = useRef<THREE.MeshStandardMaterial>(null);
+  const scan = useRef<THREE.Mesh>(null);
+  useEffect(() => () => texture.dispose(), [texture]);
+  useFrame(() => {
+    const reveal = smootherstep((animationTime.current - SCREEN_REVEAL_TIME) / 0.62);
+    if (screen.current) {
+      screen.current.opacity = reveal;
+      screen.current.emissiveIntensity = reveal * 1.25;
+    }
+    if (scan.current) {
+      scan.current.visible = reveal > 0 && reveal < 1;
+      scan.current.position.y = 4.1 - reveal * 8.2;
     }
   });
-
   return (
-    <group ref={ball}>
-      <mesh castShadow>
-        <sphereGeometry args={[0.38, 48, 32]} />
-        <meshPhysicalMaterial color="#8b0e17" roughness={0.48} clearcoat={0.34} clearcoatRoughness={0.38} />
+    <group position={[0, 11.8, -39]}>
+      <mesh position={[0, 0, -0.62]} castShadow>
+        <boxGeometry args={[21.8, 10.8, 1.25]} />
+        <meshStandardMaterial color="#252b2f" metalness={0.72} roughness={0.31} />
       </mesh>
-      <mesh rotation-x={Math.PI / 2}>
-        <torusGeometry args={[0.374, 0.012, 8, 96]} />
-        <meshStandardMaterial color="#e6d5bc" roughness={0.7} />
+      <mesh position={[0, 0, 0.03]}>
+        <planeGeometry args={[20.5, 9.6]} />
+        <meshStandardMaterial color="#050608" roughness={0.34} />
       </mesh>
-      <mesh rotation-x={Math.PI / 2} rotation-y={0.09}>
-        <torusGeometry args={[0.374, 0.008, 8, 96]} />
-        <meshStandardMaterial color="#d5c3aa" roughness={0.72} />
+      <mesh position={[0, 0, 0.055]}>
+        <planeGeometry args={[20.5, 9.6]} />
+        <meshStandardMaterial ref={screen} map={texture} emissiveMap={texture} emissive="#d51825" emissiveIntensity={0} transparent opacity={0} toneMapped={false} />
       </mesh>
+      <mesh ref={scan} position={[0, 4.1, 0.09]} visible={false}>
+        <planeGeometry args={[20.4, 0.12]} />
+        <meshBasicMaterial color="#fff2da" transparent opacity={0.85} />
+      </mesh>
+      {[-10.2, 10.2].map((x) => (
+        <mesh key={x} position={[x, -8, -0.42]} castShadow>
+          <cylinderGeometry args={[0.29, 0.48, 7.2, 16]} />
+          <meshStandardMaterial color="#626b70" metalness={0.72} roughness={0.34} />
+        </mesh>
+      ))}
     </group>
   );
 }
 
-function CinematicRig({ animationTime }: { animationTime: React.MutableRefObject<number> }) {
-  const { camera } = useThree();
+function CinematicRig({ animationTime, ballPosition }: { animationTime: React.MutableRefObject<number>; ballPosition: React.MutableRefObject<THREE.Vector3> }) {
+  const { camera, size } = useThree();
   const reducedMotion = useReducedMotion();
-  const lookAt = useRef(new THREE.Vector3(0, 1, 0));
   const desiredPosition = useMemo(() => new THREE.Vector3(), []);
   const desiredLook = useMemo(() => new THREE.Vector3(), []);
-  const startCamera = useMemo(() => new THREE.Vector3(0, 3.6, 32), []);
-  const impactCamera = useMemo(() => new THREE.Vector3(0.5, 3.3, -1.8), []);
-  const finalCamera = useMemo(() => new THREE.Vector3(0, 8.4, -10), []);
-  const scoreboardTarget = useMemo(() => new THREE.Vector3(0, 14.2, -48), []);
-  const ballPath = useMemo(
-    () => new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.85, 2.7, 40),
-      new THREE.Vector3(0.35, 2.25, 30),
-      new THREE.Vector3(-0.35, 1.65, 15),
-      new THREE.Vector3(0.48, 1.12, 0),
-      new THREE.Vector3(0.08, 0.76, FAR_WICKET_Z),
-    ]),
-    [],
-  );
-
+  const smoothedLook = useRef(new THREE.Vector3(0, 0.4, 0));
+  const start = useMemo(() => new THREE.Vector3(0.72, 1.28, 15.2), []);
+  const impact = useMemo(() => new THREE.Vector3(0.8, 1.05, -4.7), []);
+  const screenTarget = useMemo(() => new THREE.Vector3(0, 11.8, -39), []);
   useEffect(() => {
-    camera.position.copy(startCamera);
-    lookAt.current.set(0, 1.1, 12);
-    camera.lookAt(lookAt.current);
-  }, [camera, startCamera]);
-
+    camera.position.copy(start);
+    camera.lookAt(0, 0.3, -2);
+  }, [camera, start]);
   useFrame(({ clock }, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
-    animationTime.current = reducedMotion.current ? REVEAL_END : Math.min(clock.getElapsedTime(), REVEAL_END);
+    animationTime.current = reducedMotion.current ? SEQUENCE_END : Math.min(clock.getElapsedTime(), SEQUENCE_END);
     const elapsed = animationTime.current;
-
+    const perspective = camera as THREE.PerspectiveCamera;
+    const aspect = Math.max(0.42, size.width / size.height);
     if (reducedMotion.current) {
-      camera.position.copy(finalCamera);
-      camera.lookAt(scoreboardTarget);
+      const distance = Math.max(23, 11.4 / (Math.tan(THREE.MathUtils.degToRad(22)) * aspect));
+      camera.position.set(0, 11.8, -39 + distance);
+      camera.lookAt(screenTarget);
+      perspective.fov = 44;
+      perspective.updateProjectionMatrix();
       return;
     }
-
-    if (elapsed < 0.72) {
-      desiredPosition.copy(startCamera);
-      desiredLook.set(0, 1.2, 8);
+    if (elapsed < 0.85) {
+      desiredPosition.copy(start);
+      desiredLook.set(0, 0.31, -2.2);
     } else if (elapsed < IMPACT_TIME) {
-      const progress = smootherstep(elapsed / IMPACT_TIME);
-      const ballPosition = ballPath.getPointAt(progress);
-      const chaseBlend = smoothstep((elapsed - 0.72) / 1.05);
-      desiredPosition.copy(startCamera).lerp(
-        new THREE.Vector3(ballPosition.x * 0.45, ballPosition.y + 2.3, ballPosition.z + 8.4),
-        chaseBlend,
-      );
-      desiredLook.copy(ballPosition).add(new THREE.Vector3(0, 0.08, -1.8));
+      const chase = smootherstep((elapsed - 0.85) / (IMPACT_TIME - 0.85));
+      const ball = ballPosition.current;
+      desiredPosition.copy(start).lerp(new THREE.Vector3(ball.x + 0.46, Math.max(0.78, ball.y + 0.58), ball.z + 5.7), chase);
+      desiredLook.copy(ball).add(new THREE.Vector3(0, 0.08, -1.8));
     } else {
-      const rise = smootherstep((elapsed - IMPACT_TIME) / (REVEAL_END - IMPACT_TIME));
-      desiredPosition.copy(impactCamera).lerp(finalCamera, rise);
-      desiredLook.set(0, 0.8, FAR_WICKET_Z).lerp(scoreboardTarget, smoothstep((rise - 0.08) / 0.82));
+      const crane = smootherstep((elapsed - IMPACT_TIME) / 2.05);
+      const settle = smootherstep((elapsed - 6.65) / (SEQUENCE_END - 6.65));
+      const finalDistance = Math.max(23, 11.35 / (Math.tan(THREE.MathUtils.degToRad(22)) * aspect));
+      const revealPosition = new THREE.Vector3(0.4, 8.9, -7.5);
+      const finalPosition = new THREE.Vector3(0, 11.8, -39 + finalDistance);
+      desiredPosition.copy(impact).lerp(revealPosition, crane).lerp(finalPosition, settle);
+      desiredLook.set(0, 0.38, WICKET_Z).lerp(screenTarget, smootherstep((elapsed - IMPACT_TIME - 0.32) / 1.55));
     }
-
-    const damping = 1 - Math.exp(-5.2 * delta);
-    camera.position.lerp(desiredPosition, damping);
-    lookAt.current.lerp(desiredLook, 1 - Math.exp(-6.4 * delta));
-    camera.lookAt(lookAt.current);
-    const perspective = camera as THREE.PerspectiveCamera;
-    const targetFov = elapsed < IMPACT_TIME ? 54 + smoothstep(elapsed / IMPACT_TIME) * 6 : 60 - smoothstep((elapsed - IMPACT_TIME) / 2.5) * 10;
+    const positionDamping = 1 - Math.exp(-(elapsed > 6.5 ? 2.1 : 4.2) * delta);
+    camera.position.lerp(desiredPosition, positionDamping);
+    smoothedLook.current.lerp(desiredLook, 1 - Math.exp(-5.2 * delta));
+    if (elapsed > IMPACT_TIME && elapsed < IMPACT_TIME + 0.28) {
+      const shake = Math.sin((elapsed - IMPACT_TIME) * 70) * (0.035 * (1 - (elapsed - IMPACT_TIME) / 0.28));
+      camera.position.x += shake;
+      camera.position.y += shake * 0.42;
+    }
+    camera.lookAt(smoothedLook.current);
+    const targetFov = elapsed < IMPACT_TIME ? 47 + smoothstep(elapsed / IMPACT_TIME) * 4 : 51 - smoothstep((elapsed - IMPACT_TIME) / 3.4) * 7;
     perspective.fov += (targetFov - perspective.fov) * (1 - Math.exp(-3 * delta));
     perspective.updateProjectionMatrix();
   });
-
   return null;
 }
 
 function StadiumScene() {
   const animationTime = useRef(0);
-
+  const ballPosition = useRef(new THREE.Vector3(0, 1.8, 18.5));
   return (
     <>
-      <color attach="background" args={["#071015"]} />
-      <fog attach="fog" args={["#071015", 48, 108]} />
-      <hemisphereLight args={["#9cc9df", "#203d22", 1.15]} />
-      <directionalLight
-        position={[-18, 34, 24]}
-        intensity={2.65}
-        color="#fff1d5"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-left={-24}
-        shadow-camera-right={24}
-        shadow-camera-top={28}
-        shadow-camera-bottom={-28}
-        shadow-camera-near={1}
-        shadow-camera-far={80}
-      />
-      <spotLight position={[-34, 27, 28]} target-position={[0, 0, 0]} intensity={760} distance={100} angle={0.5} penumbra={0.72} color="#d9efff" />
-      <spotLight position={[34, 27, 28]} target-position={[0, 0, 0]} intensity={760} distance={100} angle={0.5} penumbra={0.72} color="#fff0d0" />
-      <spotLight position={[-34, 27, -30]} target-position={[0, 0, -4]} intensity={670} distance={100} angle={0.52} penumbra={0.72} color="#e4f2ff" />
-      <spotLight position={[34, 27, -30]} target-position={[0, 0, -4]} intensity={670} distance={100} angle={0.52} penumbra={0.72} color="#fff1d7" />
+      <color attach="background" args={["#79b8df"]} />
+      <fog attach="fog" args={["#91c4df", 82, 190]} />
+      <Sky distance={450000} sunPosition={[80, 48, 40]} inclination={0.52} azimuth={0.23} turbidity={5.2} rayleigh={1.7} mieCoefficient={0.006} mieDirectionalG={0.78} />
+      <hemisphereLight args={["#d8efff", "#51723c", 1.65]} />
+      <directionalLight position={[-24, 42, 30]} intensity={3.1} color="#fff1cf" castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} shadow-camera-left={-18} shadow-camera-right={18} shadow-camera-top={24} shadow-camera-bottom={-24} shadow-camera-near={1} shadow-camera-far={90} shadow-bias={-0.00012} />
       <Environment resolution={128}>
-        <Lightformer intensity={2.5} position={[0, 18, 10]} scale={[22, 10, 1]} />
-        <Lightformer intensity={1.6} color="#a9d7ee" position={[-20, 8, -8]} rotation-y={Math.PI / 2} scale={[32, 8, 1]} />
-        <Lightformer intensity={1.4} color="#ffd7a5" position={[20, 8, -8]} rotation-y={-Math.PI / 2} scale={[32, 8, 1]} />
+        <Lightformer intensity={2.2} position={[0, 28, 15]} scale={[38, 16, 1]} />
+        <Lightformer intensity={1.1} color="#bde5ff" position={[-30, 10, 0]} rotation-y={Math.PI / 2} scale={[40, 12, 1]} />
+        <Lightformer intensity={0.8} color="#ffe2ae" position={[30, 12, 0]} rotation-y={-Math.PI / 2} scale={[40, 10, 1]} />
       </Environment>
-
       <Field />
       <Stadium />
-      <Wicket position={[0, 0, 10.5]} animationTime={animationTime} />
-      <Wicket position={[0, 0, FAR_WICKET_Z]} far animationTime={animationTime} />
-      <CricketBall animationTime={animationTime} />
-      <DustBurst animationTime={animationTime} />
-      <Scoreboard animationTime={animationTime} />
-      <CinematicRig animationTime={animationTime} />
+      <Wicket position={[0, 0, PITCH_LENGTH / 2]} animationTime={animationTime} />
+      <Wicket position={[0, 0, WICKET_Z]} far animationTime={animationTime} />
+      <CricketBall animationTime={animationTime} ballPosition={ballPosition} />
+      <ImpactDust animationTime={animationTime} />
+      <StadiumScreen animationTime={animationTime} />
+      <CinematicRig animationTime={animationTime} ballPosition={ballPosition} />
     </>
   );
 }
@@ -518,20 +612,14 @@ function StadiumScene() {
 export default function StadiumExperience() {
   return (
     <div className="fixed inset-0 overflow-hidden bg-foreground" aria-label="Cricket stadium hosting expiry animation">
-      <Canvas
-        shadows
-        dpr={[1, 1.6]}
-        camera={{ position: [0, 3.6, 32], fov: 54, near: 0.08, far: 160 }}
-        gl={{ antialias: true, powerPreference: "high-performance" }}
-        onCreated={({ gl }) => {
-          gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1.05;
-          gl.shadowMap.type = THREE.PCFSoftShadowMap;
-        }}
-      >
+      <Canvas shadows dpr={[1, 1.65]} camera={{ position: [0.72, 1.28, 15.2], fov: 47, near: 0.015, far: 240 }} gl={{ antialias: true, powerPreference: "high-performance" }} onCreated={({ gl }) => {
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.toneMappingExposure = 1.12;
+        gl.shadowMap.type = THREE.PCFSoftShadowMap;
+      }}>
         <StadiumScene />
       </Canvas>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_42%,hsl(var(--foreground)/0.42)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,hsl(var(--foreground)/0.2)_100%)]" />
       <h1 className="sr-only">Hosting Plan Expired</h1>
     </div>
   );
