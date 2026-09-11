@@ -3,9 +3,9 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
 
-const IMPACT_TIME = 4.65;
+const IMPACT_TIME = 3.8;
 const REVEAL_END = 8.2;
-const FAR_WICKET_Z = -11;
+const FAR_WICKET_Z = -20.12;
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const smoothstep = (value: number) => {
