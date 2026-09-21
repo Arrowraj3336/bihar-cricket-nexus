@@ -339,7 +339,7 @@ function Stadium() {
             </mesh>
           ))}
         </group>
-      ))}
+      )))}
     </group>
   );
 }
