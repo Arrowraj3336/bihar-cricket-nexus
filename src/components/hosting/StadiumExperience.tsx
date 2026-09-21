@@ -304,7 +304,7 @@ function Stadium() {
           <torusGeometry args={[radius, 1.25, 4, 160]} />
           <meshStandardMaterial color={index % 2 === 0 ? "#a61e28" : "#d8d4ca"} roughness={0.7} />
         </mesh>
-      )))}
+      ))}
       {Array.from({ length: 20 }, (_, index) => {
         const angle = (index / 20) * Math.PI * 2;
         return (
@@ -339,7 +339,7 @@ function Stadium() {
             </mesh>
           ))}
         </group>
-      ))}
+      )))}
     </group>
   );
 }
