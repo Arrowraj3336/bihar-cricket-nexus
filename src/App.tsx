@@ -27,7 +27,7 @@ const App = () => (
           <Route path="/members" element={<Members />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/gallery" element={<Gallery />} />
-          <Route path="/teams/:slug" element={<TeamDetail />} />
+          <Route path="/team/:slug" element={<TeamDetail />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/brl-admin-panel" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
