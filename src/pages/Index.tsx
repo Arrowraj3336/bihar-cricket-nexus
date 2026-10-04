@@ -8,6 +8,7 @@ import AlertsSection from "@/components/AlertsSection";
 import GallerySection from "@/components/GallerySection";
 import OrganiserSection from "@/components/OrganiserSection";
 import Footer from "@/components/Footer";
+import HomeBootLoader from "@/components/HomeBootLoader";
 import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 const Index = () => {
@@ -15,6 +16,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <HomeBootLoader />
       <Navbar />
       <HeroSection />
       <TeamsSection />
