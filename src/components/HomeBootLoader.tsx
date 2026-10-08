@@ -2,24 +2,16 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import cricketBall from "@/assets/home-opener/cricket-ball.png";
 import redMist from "@/assets/home-opener/red-mist.jpg";
+import { hasPlayedHomeOpener, markHomeOpenerPlayed } from "@/lib/home-opener";
 
-const VISIT_KEY = "dbrl-ball-opener-seen";
 const DURATION = 3;
 const steps = Array.from({ length: 61 }, (_, index) => index / 60);
 // Constant forward velocity: apparent size increases with inverse distance,
 // rather than an arbitrary zoom easing. The last frames reach the camera.
 const approachScale = steps.map((time) => 0.11 / (1 - time * 0.994));
 
-function hasSeenOpener() {
-  try {
-    return window.sessionStorage.getItem(VISIT_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-const HomeBootLoader = () => {
-  const [visible, setVisible] = useState(() => !hasSeenOpener());
+const HomeBootLoader = ({ replay = false, onComplete }: { replay?: boolean; onComplete?: () => void }) => {
+  const [visible, setVisible] = useState(() => replay || !hasPlayedHomeOpener());
   const [ready, setReady] = useState(false);
   const reduceMotion = useReducedMotion();
 
@@ -31,26 +23,23 @@ const HomeBootLoader = () => {
       return image;
     });
     let active = true;
-    const fallback = window.setTimeout(() => setReady(true), 800);
     Promise.all(images.map((image) => image.decode().catch(() => undefined))).then(() => {
       if (active) setReady(true);
     });
     return () => {
       active = false;
-      window.clearTimeout(fallback);
     };
   }, [visible]);
 
   useEffect(() => {
     if (!visible || !ready) return;
-    try {
-      window.sessionStorage.setItem(VISIT_KEY, "1");
-    } catch {
-      // The animation still works when browser storage is unavailable.
-    }
-    const timer = window.setTimeout(() => setVisible(false), reduceMotion ? 350 : DURATION * 1000);
+    markHomeOpenerPlayed();
+    const timer = window.setTimeout(() => {
+      setVisible(false);
+      onComplete?.();
+    }, reduceMotion ? 350 : DURATION * 1000);
     return () => window.clearTimeout(timer);
-  }, [visible, ready, reduceMotion]);
+  }, [visible, ready, reduceMotion, onComplete]);
 
   if (!visible) return null;
 
