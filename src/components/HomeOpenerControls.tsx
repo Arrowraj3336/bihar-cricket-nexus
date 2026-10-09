@@ -43,7 +43,7 @@ const HomeOpenerControls = ({ onReplay }: { onReplay: () => void }) => {
         },
       });
       const stream = await transport.sendMessages({
-        trigger: "submit-message", chatId: "opener-suggestions", messages: [], abortSignal: abort.signal,
+        trigger: "submit-message", chatId: "opener-suggestions", messageId: undefined, messages: [], abortSignal: abort.signal,
       });
       let finalText = "";
       for await (const message of readUIMessageStream({ stream, terminateOnError: true })) {
