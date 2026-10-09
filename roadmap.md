@@ -1,4 +1,4 @@
 # Homepage opener
-- [ ] Fix automatic opening and explicit replay.
-- [ ] Add personalized AI cricket opener suggestions.
-- [ ] Verify animation, suggestions, and error states.
+- [x] Fix automatic opening and explicit replay.
+- [x] Add personalized AI cricket opener suggestions.
+- [x] Verify animation, suggestions, and error states.
