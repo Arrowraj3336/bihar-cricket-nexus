@@ -1,10 +1,11 @@
 import { APICallError } from "npm:ai@6.0.302";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createResponsesCall } from "../_shared/responses.ts";
 import { getLovableAiGatewayResponseHeaders } from "../_shared/run-id.ts";
 
 const cors = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info, x-lovable-aig-run-id",
+  ...corsHeaders,
+  "Access-Control-Allow-Headers": `${corsHeaders["Access-Control-Allow-Headers"]}, x-lovable-aig-run-id`,
 };
 
 function safeError(error: unknown): { status: number; message: string } {
@@ -31,6 +32,7 @@ Deno.serve(async (request) => {
   try { body = await request.json(); } catch {
     return Response.json({ error: "Please enter valid preferences." }, { status: 400, headers: cors });
   }
+  if (!body || typeof body !== "object" || Array.isArray(body)) return Response.json({ error: "Please enter valid preferences." }, { status: 400, headers: cors });
   const { team = "", mood = "Cinematic", preferences = "" } = body;
   if (typeof team !== "string" || team.length > 80 || typeof preferences !== "string" || preferences.length > 400 || !["Cinematic", "Match-day energy", "Minimal"].includes(mood)) {
     return Response.json({ error: "Please keep preferences within the displayed limits." }, { status: 400, headers: cors });
